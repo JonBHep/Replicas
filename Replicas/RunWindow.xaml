@@ -1,0 +1,223 @@
+﻿<Window x:Class="Replicas.RunWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:Replicas"
+        mc:Ignorable="d"
+        Title="Replicate" WindowStyle="None" AllowsTransparency="True" Background="Transparent" Height="600" Width="1100" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing" ContentRendered="Window_ContentRendered" SizeToContent="Height"
+        x:ClassModifier="internal">
+    <Window.Resources>
+        <Style x:Key="styHeading" TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="Teal"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="6"/>
+        </Style>
+
+        <Style x:Key="styCaption" TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="Teal"/>
+            <Setter Property="Margin" Value="6"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="styValue" TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="DarkGreen"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Margin" Value="6"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="styNumeric" TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="DarkGreen"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Margin" Value="6"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+        </Style>
+        <Style TargetType="ProgressBar">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Background" Value="Ivory"/>
+            <Setter Property="Foreground" Value="SandyBrown"/>
+            <Setter Property="Value" Value="33"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="8"/>
+            <Setter Property="Margin" Value="0 3 0 0"></Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48"></RowDefinition>
+            <RowDefinition Height="18"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Border CornerRadius="16" BorderBrush="SaddleBrown" BorderThickness="2" Background="LightYellow">
+            <TextBlock x:Name="txtTitle" FontSize="16" Foreground="Teal" VerticalAlignment="Center" Margin="24 0 0 0">xxx</TextBlock>
+        </Border>
+        <Border Grid.Row="2" Background="LightYellow" CornerRadius="16" BorderBrush="SaddleBrown" BorderThickness="2">
+            <Grid Margin="16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid Background="LightYellow">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBlock x:Name="lblHeadingSource" Style="{StaticResource styHeading}"><Run Text="SOURCE"/></TextBlock>
+                    <TextBlock x:Name="lblDriveS" Style="{StaticResource styValue}" Grid.Column="1" ><Run Text="[drive]"/></TextBlock>
+                    <TextBlock x:Name="lblPathS" Style="{StaticResource styValue}" Grid.Row="1" Grid.ColumnSpan="2"><Run Text="[path]"/></TextBlock>
+                    <TextBlock x:Name="lblSourceFoldersL" Style="{StaticResource styCaption}" Grid.Column="3" VerticalAlignment="Center" ><Run Text="directories"/></TextBlock>
+                    <TextBlock x:Name="lblSourceFilesL" Style="{StaticResource styCaption}" Grid.Column="5" VerticalAlignment="Center" ><Run Text="files"/></TextBlock>
+                    <TextBlock x:Name="lblSourceFolders" Style="{StaticResource styValue}" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="lblSourceFiles" Style="{StaticResource styValue}" Grid.Column="4" HorizontalAlignment="Right" VerticalAlignment="Center"><Run Text="0"/></TextBlock>
+                </Grid>
+                <Grid Grid.Row="1" Background="LightYellow">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBlock x:Name="lblHeadingDestin"  Style="{StaticResource styHeading}" ><Run Text="DESTINATION"/></TextBlock>
+                    <TextBlock x:Name="lblDriveD" Style="{StaticResource styValue}" Grid.Column="1" ><Run Text="[drive]"/></TextBlock>
+                    <TextBlock x:Name="lblPathD" Style="{StaticResource styValue}" Grid.Row="1" Grid.ColumnSpan="2"><Run Text="[path]"/></TextBlock>
+                    <TextBlock x:Name="lblDestinFoldersL" Style="{StaticResource styCaption}" Grid.Column="3" VerticalAlignment="Center" ><Run Text="directories"/></TextBlock>
+                    <TextBlock x:Name="lblDestinFilesL" Style="{StaticResource styCaption}" Grid.Column="5" VerticalAlignment="Center" ><Run Text="files"/></TextBlock>
+                    <TextBlock x:Name="lblDestinFolders" Style="{StaticResource styValue}" Grid.Column="2"  HorizontalAlignment="Right" VerticalAlignment="Center"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="lblDestinFiles" Style="{StaticResource styValue}" Grid.Column="4" HorizontalAlignment="Right" VerticalAlignment="Center"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="lblFolderBalance" Style="{StaticResource styValue}" Grid.Column="3" Grid.Row="1" TextAlignment="Left" VerticalAlignment="Center"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="lblFileBalance" Style="{StaticResource styValue}" Grid.Column="5" Grid.Row="1" TextAlignment="Left" VerticalAlignment="Center"><Run Text="0"/></TextBlock>
+                </Grid>
+                <Border Grid.Row="2" BorderBrush="Teal" BorderThickness="0 2 0 2">
+                    <StackPanel Orientation="Horizontal" Grid.Row="2" Background="LightYellow">
+                        <TextBlock x:Name="lblHiddenL" Style="{StaticResource styCaption}"><Run Text="Hidden files and directories"/></TextBlock>
+                        <TextBlock x:Name="lblHidden" Style="{StaticResource styValue}"><Run Text="[Included]"/></TextBlock>
+                        <TextBlock x:Name="lblLastPerformedL" Style="{StaticResource styCaption}"><Run Text="Last performed"/></TextBlock>
+                        <TextBlock x:Name="lblLastPerformed" Style="{StaticResource styValue}"><Run Text="[when]"/></TextBlock>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Row="3" BorderBrush="Teal" BorderThickness="0 0 0 2">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Background="LightYellow">
+                            <TextBlock Style="{StaticResource styCaption}" Width="140"><Run Text="Source"/></TextBlock>
+                            <ProgressBar x:Name="prgSource" Width="100" Maximum="100" VerticalAlignment="Center" VerticalContentAlignment="Center" Foreground="Teal" Background="MediumAquamarine"/>
+                            <TextBlock x:Name="lblSourceScope" Style="{StaticResource styValue}"><Run Text="[000]"/></TextBlock>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Background="LightYellow">
+                            <TextBlock Width="140" Style="{StaticResource styCaption}"><Run Text="Destination before backup"/></TextBlock>
+                            <ProgressBar x:Name="prgDestinationBefore" Width="100" Maximum="100" VerticalAlignment="Center" VerticalContentAlignment="Center" Foreground="Teal" Background="MediumAquamarine"/>
+                            <TextBlock x:Name="lblDestinationBeforeScope" Style="{StaticResource styValue}"><Run Text="[000]"/></TextBlock>
+                        </StackPanel>
+                        <StackPanel x:Name="stackpanelafter" Orientation="Horizontal" Background="LightYellow">
+                            <TextBlock Style="{StaticResource styCaption}" Width="140" ><Run Text="Destination after backup"/></TextBlock>
+                            <ProgressBar x:Name="prgDestinationAfter" Width="100" Maximum="100" VerticalAlignment="Center" VerticalContentAlignment="Center" Foreground="Teal" Background="MediumAquamarine"/>
+                            <TextBlock x:Name="lblDestinationAfterScope" Style="{StaticResource styValue}"><Run Text="[000]"/></TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+                <Grid Grid.Row="4" Background="LightYellow">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="260"/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="48"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="1" Style="{StaticResource styCaption}">Examine source directories and files</TextBlock>
+                    <TextBlock Grid.Row="2" Style="{StaticResource styCaption}">Examine destination directories and files</TextBlock>
+                    <!--<TextBlock Grid.Row="3" Style="{StaticResource styCaption}">Select the items requiring action</TextBlock>-->
+                    <!--<TextBlock Grid.Row="4" Style="{StaticResource styCaption}">Build a list of required tasks</TextBlock>-->
+                    <DockPanel Grid.Row="3">
+                        <TextBlock DockPanel.Dock="Right" Style="{StaticResource styCaption}">bytes</TextBlock>
+                        <TextBlock Style="{StaticResource styCaption}">Perform the update</TextBlock>
+                    </DockPanel>
+                    <TextBlock Grid.Row="4" TextAlignment="Right" Style="{StaticResource styCaption}">files</TextBlock>
+
+                    <ProgressBar x:Name="progressbarSource" Grid.Row="1" Grid.Column="1"/>
+                    <ProgressBar x:Name="progressbarDestination" Grid.Row="2" Grid.Column="1"/>
+                    <ProgressBar x:Name="progressbarUpdateSize" Grid.Row="3" Grid.Column="1"/>
+                    <ProgressBar x:Name="progressbarUpdateNumber" Grid.Row="4" Grid.Column="1"/>
+                    <TextBlock x:Name="textblockProgressSource" Style="{StaticResource styCaption}" Grid.Row="1" Grid.Column="2" Width="32">0%</TextBlock>
+                    <TextBlock x:Name="textblockProgressDestination" Style="{StaticResource styCaption}" Grid.Row="2" Grid.Column="2" Width="32">0%</TextBlock>
+                    <TextBlock x:Name="textblockProgressUpdateSize" Style="{StaticResource styCaption}" Grid.Row="3" Grid.Column="2" Width="32">0%</TextBlock>
+                    <TextBlock x:Name="textblockProgressUpdateNumber" Style="{StaticResource styCaption}" Grid.Row="4" Grid.Column="2" Width="32">0%</TextBlock>
+                    <TextBlock x:Name="ActionsToDoTBk" Grid.Column="5" Grid.Row="0" Style="{StaticResource styCaption}" HorizontalAlignment="Right"><Run Text="Items"/></TextBlock>
+                    <TextBlock x:Name="ActionsDoneTBk" Grid.Column="6" Grid.Row="0" Style="{StaticResource styCaption}" HorizontalAlignment="Right"><Run Text="Done"/></TextBlock>
+                    <TextBlock x:Name="ActionsFailedTBk" Grid.Column="7" Grid.Row="0" Style="{StaticResource styCaption}" HorizontalAlignment="Right" Foreground="Red"><Run Text="Errors"/></TextBlock>
+                    <TextBlock x:Name="BytesToDoTBk" Grid.Column="8" Grid.Row="0" Style="{StaticResource styCaption}" HorizontalAlignment="Right"><Run Text="Bytes"/></TextBlock>
+                    <TextBlock x:Name="BytesDoneTBk" Grid.Column="9" Grid.Row="0" Style="{StaticResource styCaption}" HorizontalAlignment="Right"><Run Text="Done"/></TextBlock>
+                    <TextBlock x:Name="lblActionFD" Style="{StaticResource styCaption}" Grid.Column="4" Grid.Row="1"><Run Text="Files to delete"/></TextBlock>
+                    <TextBlock x:Name="lblActionDD" Style="{StaticResource styCaption}" Grid.Column="4" Grid.Row="2"><Run Text="Directories to delete"/></TextBlock>
+                    <TextBlock x:Name="lblActionDA" Style="{StaticResource styCaption}" Grid.Column="4" Grid.Row="3"><Run Text="Directories to add"/></TextBlock>
+                    <TextBlock x:Name="lblActionFU" Style="{StaticResource styCaption}" Grid.Column="4" Grid.Row="4"><Run Text="Files to update"/></TextBlock>
+                    <TextBlock x:Name="lblActionFA" Style="{StaticResource styCaption}" Grid.Column="4" Grid.Row="5"><Run Text="Files to add"/></TextBlock>
+
+                    <TextBlock x:Name="FilesToDeleteTBk" Style="{StaticResource styNumeric}" Grid.Column="5" Grid.Row="1"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="FilesDeletedTBk" Style="{StaticResource styNumeric}" Grid.Column="6" Grid.Row="1"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="FileDeleteErrorsTBk" Style="{StaticResource styNumeric}" Grid.Column="7" Grid.Row="1"><Run Text="0" Foreground="Red"/></TextBlock>
+
+                    <TextBlock x:Name="DirectoriesToDeleteTBk" Style="{StaticResource styNumeric}" Grid.Column="5" Grid.Row="2"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="DirectoriesDeletedTBk" Style="{StaticResource styNumeric}" Grid.Column="6" Grid.Row="2"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="DirectoryDeleteErrorsTBk" Style="{StaticResource styNumeric}" Grid.Column="7" Grid.Row="2" Foreground="Red"><Run Text="0"/></TextBlock>
+
+                    <TextBlock x:Name="DirectoriesToAddTBk" Style="{StaticResource styNumeric}" Grid.Column="5" Grid.Row="3"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="DirectoriesAddedTBk" Style="{StaticResource styNumeric}" Grid.Column="6" Grid.Row="3"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="DirectoryAddErrorsTBk" Style="{StaticResource styNumeric}" Grid.Column="7" Grid.Row="3"><Run Text="0" Foreground="Red"/></TextBlock>
+
+                    <TextBlock x:Name="FilesToUpdateTBk" Style="{StaticResource styNumeric}" Grid.Column="5" Grid.Row="4"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="FilesUpdatedTBk" Style="{StaticResource styNumeric}" Grid.Column="6" Grid.Row="4"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="FileUpdateErrorsTBk" Style="{StaticResource styNumeric}" Grid.Column="7" Grid.Row="4" Foreground="Red"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="FileBytesToUpdateTBk" Style="{StaticResource styNumeric}" Grid.Column="8" Grid.Row="4"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="FileBytesUpdatedTBk" Style="{StaticResource styNumeric}" Grid.Column="9" Grid.Row="4"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="FilesToAddTBk" Style="{StaticResource styNumeric}" Grid.Column="5" Grid.Row="5"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="FilesAddedTBk" Style="{StaticResource styNumeric}" Grid.Column="6" Grid.Row="5"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="FileAddErrorsTBk" Style="{StaticResource styNumeric}" Grid.Column="7" Grid.Row="5" Foreground="Red"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="FileBytesToAddTBk" Style="{StaticResource styNumeric}" Grid.Column="8" Grid.Row="5"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="FileBytesAddedTBk" Style="{StaticResource styNumeric}" Grid.Column="9" Grid.Row="5"><Run Text="0"/></TextBlock>
+                </Grid>
+                <DockPanel Grid.Row="5" LastChildFill="False">
+                    <Button x:Name="buttonClose" Style="{StaticResource styleButtonBold}" Margin="2 6 6 16" VerticalAlignment="Center" Width="128" DockPanel.Dock="Right" Click="CloseButton_Click" Content="Close"/>
+                    <Button x:Name="buttonDetail" Style="{StaticResource styleButtonNorm}" Margin="2 6 6 16" VerticalAlignment="Center" Width="128" DockPanel.Dock="Right" Click="LogButton_Click" Content="Detail of actions"/>
+                    <Button x:Name="buttonUpdate" Style="{StaticResource styleButtonBold}" Margin="2 6 6 16" VerticalAlignment="Center" Width="128" DockPanel.Dock="Right" Click="UpdateButton_Click" Content="Perform update"/>
+                    <Button x:Name="buttonCancelUpdate" Style="{StaticResource styleButtonNorm}" Margin="2 6 6 16" VerticalAlignment="Center" Width="128" DockPanel.Dock="Right" Content="Cancel updating" Click="Cancel_Click"/>
+                    <Button x:Name="buttonAnalysePlus" Style="{StaticResource styleButtonBold}" Margin="2 6 6 16" VerticalAlignment="Center" Width="144" DockPanel.Dock="Right" Click="Analyse_Click" Content="Analyse and update"/>
+                    <Button x:Name="buttonAnalyse" Style="{StaticResource styleButtonBold}" Margin="2 6 6 16" VerticalAlignment="Center" Width="84" DockPanel.Dock="Right" Click="Analyse_Click" Content="Analyse"/>
+                    <TextBlock x:Name="textblockMessage" DockPanel.Dock="Right" Height="24" FontWeight="Black" Margin="8 6 8 16" Padding="0 4 0 0" VerticalAlignment="Center" ><Run Text="Displayed message"/></TextBlock>
+                </DockPanel>
+            </Grid>
+        </Border>
+
+    </Grid>
+</Window>
