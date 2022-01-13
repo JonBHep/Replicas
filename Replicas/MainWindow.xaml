@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Replicas"
         mc:Ignorable="d"
-        Title="Replicate" Height="980" Width="1480" Background="Transparent" AllowsTransparency="True" Icon="JH Aramis green utility.ico" WindowStartupLocation="CenterScreen" Closing="Window_Closing" Loaded="Window_Loaded" WindowStyle="None" ContentRendered="Window_ContentRendered">
+        Title="Replicate" Height="980" Width="1480" Background="Transparent" AllowsTransparency="True" WindowStartupLocation="CenterScreen" Closing="Window_Closing" Loaded="Window_Loaded" WindowStyle="None" ContentRendered="Window_ContentRendered">
     <Window.Resources>
 
         <DataTemplate x:Key="TitleTemplate">
