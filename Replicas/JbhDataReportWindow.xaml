@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:Replicas"
         mc:Ignorable="d"
-        Title="Jbh.Info backups report" Height="800" Width="800" Icon="JH Aramis green utility.ico" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" WindowStyle="None" ContentRendered="Window_ContentRendered">
+        Title="Jbh.Info backups report" Height="800" Width="800" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" WindowStyle="None" ContentRendered="Window_ContentRendered">
 
     <Grid Background="ForestGreen">
         <Grid.RowDefinitions>

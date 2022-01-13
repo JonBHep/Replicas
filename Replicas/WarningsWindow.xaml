@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:Replicas"
         mc:Ignorable="d"
-        Title="Warnings" Height="300" Width="300" Background="Ivory" Icon="JH Aramis green utility.ico" Topmost="True" WindowStartupLocation="CenterScreen"
+        Title="Warnings" Height="300" Width="300" Background="Ivory" Topmost="True" WindowStartupLocation="CenterScreen"
         x:ClassModifier="internal">
     <Grid d:IsLocked="True">
         <Grid.RowDefinitions>

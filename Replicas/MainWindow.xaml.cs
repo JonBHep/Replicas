@@ -434,20 +434,33 @@ namespace Replicas
             Tache one = Kernel.Instance.JobProfiles.Jobs[Kernel.Instance.CurrentTask];
             if (one.Dangerous)
             {
-                MessageBoxResult challenge = MessageBox.Show("This job is marked as dangerous. It risks overwriting good data.\n\nGo ahead?", Jbh.AppManager.AppName, MessageBoxButton.OKCancel, MessageBoxImage.Exclamation);
-                if (challenge == MessageBoxResult.Cancel) { return; }
+                MessageBoxResult challenge
+                    = MessageBox.Show("This job is marked as dangerous. It risks overwriting good data.\n\nGo ahead?"
+                        , Jbh.AppManager.AppName, MessageBoxButton.OKCancel, MessageBoxImage.Exclamation);
+                if (challenge == MessageBoxResult.Cancel)
+                {
+                    return;
+                }
             }
-            using (RunWindow w = new RunWindow())
+
+            _tmrUpdate.IsEnabled = false;
+            RunWindow w = new RunWindow() {Owner = this};
+            Hide();
+            w.ShowDialog();
+            Show();
+            if (w.Fulfilled)
             {
-                _tmrUpdate.IsEnabled = false;
-                w.Owner = this;
-                this.Hide();
-                w.ShowDialog();
-                this.Show();
-                if (w.Fulfilled) {one.LastDate= DateTime.Now; } else { MessageBox.Show("The backup job was not fully completed", "Replicas", MessageBoxButton.OK, MessageBoxImage.Asterisk); }
+                one.LastDate = DateTime.Now;
             }
+            else
+            {
+                MessageBox.Show("The backup job was not fully completed", "Replicas", MessageBoxButton.OK
+                    , MessageBoxImage.Asterisk);
+            }
+
             _tmrUpdate.IsEnabled = true;
-            Kernel.Instance.JobProfiles.SaveProfile(); // To ensure this backup event is recorded before the user has the opportunity to click the Refresh button
+            Kernel.Instance.JobProfiles
+                .SaveProfile(); // To ensure this backup event is recorded before the user has the opportunity to click the Refresh button
             RunButtons(false);
             btnEdit.IsEnabled = false;
             RefreshLists();
@@ -519,7 +532,7 @@ namespace Replicas
 
         private void DatabankButton_Click(object sender, RoutedEventArgs e)
         {
-            JbhInfoReportWindow w = new JbhInfoReportWindow(Kernel.Instance.JobProfiles.JbhInfoDates(), Kernel.Instance.JobProfiles.JbhBusinessDates())
+            JbhDataReportWindow w = new JbhDataReportWindow(Kernel.Instance.JobProfiles.JbhInfoDates(), Kernel.Instance.JobProfiles.JbhBusinessDates())
             {
                 Owner = this
             };

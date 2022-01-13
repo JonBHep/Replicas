@@ -15,7 +15,7 @@ internal partial class RunWindow : Window
 {
     
     private Tache boulot;
-        private bool disposed;
+        // private bool disposed;
         private ReplicaJobTasks tasks;
         private UpdaterResults results;
         private bool includeHidden;
@@ -102,12 +102,9 @@ internal partial class RunWindow : Window
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (buttonClose.Visibility != Visibility.Visible)
-            {
-                MessageBox.Show("JBH: I am not allowing window closure because the Close button is not visible", "Replicas", MessageBoxButton.OK, MessageBoxImage.Warning);
-                e.Cancel = true;
-                return;
-            }
+            if (buttonClose.Visibility == Visibility.Visible) return;
+            MessageBox.Show("JBH: I am not allowing window closure because the Close button is not visible", "Replicas", MessageBoxButton.OK, MessageBoxImage.Warning);
+            e.Cancel = true;
         }
 
         private void ImplementUpdate(string SourceRootDir, string DestinationRootDir, ReplicaJobTasks jobs, IProgress<ProgressInfo> prog, CancellationToken cancellationToken)
@@ -708,37 +705,37 @@ internal partial class RunWindow : Window
             FileUpdateErrorsTBk.Visibility = vis;
         }
 
-        public void Dispose()
-        {
-                // Explicitly dispose of resources
-                Dispose(true);
-                // Tell GC [Garbage Collection] not to finalize us--we've already done it manually
-                GC.SuppressFinalize(this);
-        }
+        // public void Dispose()
+        // {
+        //         // Explicitly dispose of resources
+        //         Dispose(true);
+        //         // Tell GC [Garbage Collection] not to finalize us--we've already done it manually
+        //         GC.SuppressFinalize(this);
+        // }
 
-        // Function called via Dispose method or via Finalizer
-        protected virtual void Dispose(bool explicitDispose)
-        {
-            if (!disposed)
-            {
-                // Free some resources only when invoking via Dispose
-                if (!(cts is null))
-                {
-                    if (explicitDispose) { cts.Dispose(); }
-                }
-                
-                    //FreeManagedResources();   // Define this method
-
-                // Free unmanaged resources here--whether via Dispose
-                //   or via finalizer
-                //FreeUnmanagedResources();
-
-                disposed = true;
-            }
-        }
-        // Finalizer
-        ~RunWindow()
-        {
-            Dispose(false);
-        }
+        // // Function called via Dispose method or via Finalizer
+        // protected virtual void Dispose(bool explicitDispose)
+        // {
+        //     if (!disposed)
+        //     {
+        //         // Free some resources only when invoking via Dispose
+        //         if (!(cts is null))
+        //         {
+        //             if (explicitDispose) { cts.Dispose(); }
+        //         }
+        //         
+        //             //FreeManagedResources();   // Define this method
+        //
+        //         // Free unmanaged resources here--whether via Dispose
+        //         //   or via finalizer
+        //         //FreeUnmanagedResources();
+        //
+        //         disposed = true;
+        //     }
+        // }
+        // // Finalizer
+        // ~RunWindow()
+        // {
+        //     Dispose(false);
+        // }
 }

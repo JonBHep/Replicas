@@ -6,140 +6,182 @@ using System.Windows.Input;
 
 namespace Replicas;
 
-internal partial class FolderBrowser : Window
+internal partial class FolderBrowser
 {
-    public FolderBrowser()
+    internal FolderBrowser()
     {
+        _selectedDirectory = "C:\\";
         InitializeComponent();
     }
-    private string _selectedDirectory;
-        //private readonly string _naString = "Not accessible";
 
-        public string SelectedDirectory
+    internal FolderBrowser(string selectedDirectory)
+    {
+        _selectedDirectory = selectedDirectory;
+        InitializeComponent();
+    }
+
+    private string _selectedDirectory;
+
+    public string SelectedDirectory => _selectedDirectory;
+
+    private void ComboDrives_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (ComboDrives.SelectedItem == null)
         {
-            get
-            {
-                return _selectedDirectory;
-            }
+            return;
         }
 
-        private void ComboDrives_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        var dName = ComboDrives.SelectedItem.ToString()?[..3];
+        if (!string.IsNullOrEmpty(dName))
         {
-            if (comboDrives.SelectedItem == null) { return; };
-            string dName = comboDrives.SelectedItem.ToString().Substring(0, 3);
             DisplayDirectory(dName);
         }
+    }
 
-        private void DisplayDirectory(string directoryPath)
+    private void DisplayDirectory(string directoryPath)
+    {
+        ListboxChildren.Items.Clear();
+        TextBlockPath.ToolTip = TextBlockPath.Text = directoryPath;
+        _selectedDirectory = TextBlockPath.Text;
+        try
         {
-            listboxChildren.Items.Clear();
-            textblockPath.ToolTip = textblockPath.Text = directoryPath;
-            _selectedDirectory = textblockPath.Text;
-            string[] subs;
-            try
+            var subs = Directory.GetDirectories(directoryPath);
+            foreach (string subDir in subs)
             {
-                subs = Directory.GetDirectories(directoryPath);
-                foreach (string subdir in subs)
+                DirectoryInfo di = new(subDir);
+                bool directoryIsHidden = (di.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden;
+                bool permitHidden = false;
+                if (ChkHidden.IsChecked.HasValue)
                 {
-                    DirectoryInfo di = new DirectoryInfo(subdir);
-                    bool isHidden = (di.Attributes & System.IO.FileAttributes.Hidden) == System.IO.FileAttributes.Hidden;
-                    if (!isHidden || (bool)chkHidden.IsChecked)
+                    if (ChkHidden.IsChecked.Value)
                     {
-                        listboxChildren.Items.Add(System.IO.Path.GetFileName(subdir));
-                    } // GetFileName gets the last element in the path even if this is a directory name
+                        permitHidden = true;
+                    }
                 }
-            }
-            catch(UnauthorizedAccessException uaex)
-            {
-                MessageBox.Show(uaex.Message);
-            }
-            catch (ArgumentNullException ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            catch (ArgumentException ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            catch (PathTooLongException ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            catch (DirectoryNotFoundException ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            catch (IOException ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            //{ listboxChildren.Items.Add(_naString); }
-        }
 
-        private void ListboxChildren_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+                if (permitHidden || !directoryIsHidden)
+                {
+                    string s = Path.GetFileName(subDir);
+                    ListboxChildren.Items.Add(s);
+                } // GetFileName gets the last element in the path even if this is a directory name
+            }
+        }
+        catch (UnauthorizedAccessException uaException)
         {
-            if (listboxChildren.SelectedItems.Count < 1) { return; };
-            //if (listboxChildren.SelectedItems[0].ToString() == _naString) { return; };
-            string nextPath = System.IO.Path.Combine(textblockPath.Text, listboxChildren.SelectedItems[0].ToString());
+            MessageBox.Show(uaException.Message);
+        }
+        catch (ArgumentNullException ex)
+        {
+            MessageBox.Show(ex.Message);
+        }
+        catch (ArgumentException ex)
+        {
+            MessageBox.Show(ex.Message);
+        }
+        catch (PathTooLongException ex)
+        {
+            MessageBox.Show(ex.Message);
+        }
+        catch (DirectoryNotFoundException ex)
+        {
+            MessageBox.Show(ex.Message);
+        }
+        catch (IOException ex)
+        {
+            MessageBox.Show(ex.Message);
+        }
+    }
+
+    private void ListboxChildren_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (ListboxChildren.SelectedItem is string q)
+        {
+            string nextPath = Path.Combine(TextBlockPath.Text, q);
             DisplayDirectory(nextPath);
         }
+    }
 
-        private void ButtonUp_Click(object sender, RoutedEventArgs e)
+    private void ButtonUp_Click(object sender, RoutedEventArgs e)
+    {
+        if (TextBlockPath.Text.Length < 4)
         {
-            if (textblockPath.Text.Length < 4) { return; };
-            string nextPath = System.IO.Path.GetDirectoryName(textblockPath.Text);
-            DisplayDirectory(nextPath);
+            return;
         }
 
-        private void ButtonSelect_Click(object sender, RoutedEventArgs e)
+        var kk = Path.GetDirectoryName(TextBlockPath.Text);
+        if (!string.IsNullOrEmpty(kk))
         {
-            DialogResult = true;
+            DisplayDirectory(kk);
+        }
+    }
+
+    private void ButtonSelect_Click(object sender, RoutedEventArgs e)
+    {
+        DialogResult = true;
+    }
+
+    private void ButtonCancel_Click(object sender, RoutedEventArgs e)
+    {
+        DialogResult = false;
+    }
+
+    private void ButtonCreate_Click(object sender, RoutedEventArgs e)
+    {
+        string q = NewDirectoryTextBox.Text.Trim();
+        if (string.IsNullOrEmpty(q))
+        {
+            MessageBox.Show("Enter a name for the new directory in the text box", "Create directory"
+                , MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
         }
 
-        private void ButtonCancel_Click(object sender, RoutedEventArgs e)
-        {
-            DialogResult = false;
-        }
+        string newDirectoryPath = Path.Combine(_selectedDirectory, q);
+        Directory.CreateDirectory(newDirectoryPath);
+        DisplayDirectory(_selectedDirectory);
+    }
 
-        private void ButtonCreate_Click(object sender, RoutedEventArgs e)
+    private void Window_Loaded(object sender, RoutedEventArgs e)
+    {
+        ComboDrives.Items.Clear();
+        foreach (DriveInfo drv in DriveInfo.GetDrives())
         {
-            string q = NewDirectoryTextBox.Text.Trim();
-            if (string.IsNullOrEmpty(q))
+            if (drv.IsReady)
             {
-                MessageBox.Show("Enter a name for the new directory in the text box", "Create directory", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
+                ComboDrives.Items.Add(drv.Name + " [" + drv.VolumeLabel + "]");
             }
-            string newDirectoryPath = System.IO.Path.Combine(_selectedDirectory, q);
-            System.IO.Directory.CreateDirectory(newDirectoryPath);
-            DisplayDirectory(_selectedDirectory);
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        if (ComboDrives.Items.Count > 0)
         {
-            comboDrives.Items.Clear();
-            foreach (System.IO.DriveInfo drv in System.IO.DriveInfo.GetDrives())
-            {
-                if (drv.IsReady)
-                { comboDrives.Items.Add(drv.Name + " [" + drv.VolumeLabel + "]"); }
-            }
-            if (comboDrives.Items.Count > 0) { comboDrives.SelectedIndex = 0; }
-            if (this.Owner != null) { Icon = this.Owner.Icon; }
+            ComboDrives.SelectedIndex = 0;
         }
 
-        private void ChkHidden_Checked(object sender, RoutedEventArgs e)
+        if (this.Owner != null)
         {
-            if (string.IsNullOrWhiteSpace(textblockPath.Text)) { return; };
-            DisplayDirectory(textblockPath.Text);
+            Icon = this.Owner.Icon;
+        }
+    }
+
+    private void ChkHidden_Checked(object sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(TextBlockPath.Text))
+        {
+            return;
         }
 
-        private void ChkHidden_Unchecked(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(textblockPath.Text)) { return; };
-            DisplayDirectory(textblockPath.Text);
-        }
+        DisplayDirectory(TextBlockPath.Text);
+    }
 
-        public void SetTitle(string titleBarText)
+    private void ChkHidden_Unchecked(object sender, RoutedEventArgs e)
+    {
+        if (!string.IsNullOrWhiteSpace(TextBlockPath.Text))
         {
-            this.Title = titleBarText;
+            DisplayDirectory(TextBlockPath.Text);
         }
+    }
+
+    public void SetTitle(string titleBarText)
+    {
+        Title = titleBarText;
+    }
 }

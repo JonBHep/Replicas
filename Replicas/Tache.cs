@@ -1,4 +1,6 @@
-﻿namespace Replicas;
+﻿using System;
+
+namespace Replicas;
 
 internal class Tache : IComparable<Tache>
 {
