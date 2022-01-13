@@ -106,7 +106,7 @@ internal partial class FamilyPublishWindow : IDisposable
 
         private void SelectSourceButton_Click(object sender, RoutedEventArgs e)
         {
-            Jbh.FolderBrowser browser = new Jbh.FolderBrowser() { Owner = this };
+            FolderBrowser browser = new FolderBrowser() { Owner = this };
             bool? Q = browser.ShowDialog();
             if (Q.HasValue && Q.Value)
             {
@@ -117,7 +117,7 @@ internal partial class FamilyPublishWindow : IDisposable
 
         private void SelectTargetButton_Click(object sender, RoutedEventArgs e)
         {
-            Jbh.FolderBrowser browser = new Jbh.FolderBrowser() { Owner = this };
+            FolderBrowser browser = new FolderBrowser() { Owner = this };
             bool? Q = browser.ShowDialog();
             if (Q.HasValue && Q.Value)
             {

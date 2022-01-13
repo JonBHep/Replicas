@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:Replicas"
         mc:Ignorable="d"
-        Title="Disk drives" Height="850" Width="1200" ShowInTaskbar="False" Icon="JH Aramis green utility.ico" ResizeMode="NoResize" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen"
+        Title="Disk drives" Height="850" Width="1200" ShowInTaskbar="False" ResizeMode="NoResize" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen"
         x:ClassModifier="internal">
     <Grid>
         <Grid.RowDefinitions>

@@ -183,7 +183,7 @@ internal partial class DrivesWindow : Window
                 {
                     string lbl = Kernel.Instance.KnownDrives.RecognisedDrives[index].VolumeLabel;
                     string cap = Kernel.Instance.KnownDrives.RecognisedDrives[index].MyDescription;
-                    Jbh.InputBox ib = new Jbh.InputBox(BoxTitle: "Drive description", PromptText: lbl, DefaultResponse: cap) { Owner = this };
+                    InputBox ib = new InputBox(BoxTitle: "Drive description", PromptText: lbl, DefaultResponse: cap) { Owner = this };
                     if (ib.ShowDialog() == true)
                     {
                         Kernel.Instance.KnownDrives.SpecifyVolumeDescription(lbl, ib.ResponseText);
