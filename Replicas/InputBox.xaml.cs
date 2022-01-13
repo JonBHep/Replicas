@@ -12,7 +12,7 @@ public partial class InputBox : Window
     public InputBox(string BoxTitle, string PromptText, string DefaultResponse)
     {
         InitializeComponent();
-        this.Title = BoxTitle;
+        Title = BoxTitle;
         textblockPrompt.Text = PromptText;
         textboxResponse.Text = DefaultResponse;
     }
@@ -31,7 +31,7 @@ public partial class InputBox : Window
 
     private void Window_ContentRendered(object sender, EventArgs e)
     {
-        Icon = this.Owner.Icon;
+        Icon = Owner.Icon;
         textboxResponse.Focus();
     }
 }

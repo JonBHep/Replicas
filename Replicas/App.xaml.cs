@@ -43,7 +43,7 @@ namespace Replicas
             }
             else
             {
-                App.Current.Shutdown();
+                Current.Shutdown();
             }
         }
 

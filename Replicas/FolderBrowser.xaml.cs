@@ -156,9 +156,9 @@ internal partial class FolderBrowser
             ComboDrives.SelectedIndex = 0;
         }
 
-        if (this.Owner != null)
+        if (Owner != null)
         {
-            Icon = this.Owner.Icon;
+            Icon = Owner.Icon;
         }
     }
 

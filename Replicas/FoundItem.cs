@@ -32,13 +32,13 @@ internal class FoundItem
                 SourcePresent = true;
                 if (isDir)
                 {
-                    DestinPresent = System.IO.Directory.Exists(DestinPath);
+                    DestinPresent = Directory.Exists(DestinPath);
                 }
                 else
                 {
                     FileInfo sfi = new FileInfo(SourcePath);
                     TaskBulk = sfi.Length;
-                    DestinPresent = System.IO.File.Exists(DestinPath);
+                    DestinPresent = File.Exists(DestinPath);
                     if (DestinPresent)
                     {
                         FileInfo dfi = new FileInfo(DestinPath);

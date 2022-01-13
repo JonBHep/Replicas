@@ -16,14 +16,14 @@ internal partial class RunWindow
     
     private Tache _boulot;
         // private bool disposed;
-        private ReplicaJobTasks tasks;
-        private UpdaterResults results;
-        private bool includeHidden;
-        private bool runOn; // whether to run straight on from analysis to perform the update
-        private long freespacebefore;
+        private ReplicaJobTasks _tasks;
+        private UpdaterResults _results;
+        private bool _includeHidden;
+        private bool _runOn; // whether to run straight on from analysis to perform the update
+        private long _freespacebefore;
         internal bool Fulfilled;
-        private Progress<ProgressInfo> progressChaser;
-        private CancellationTokenSource cts;
+        private Progress<ProgressInfo> _progressChaser;
+        private CancellationTokenSource _cts;
         internal RunWindow()
         {
             InitializeComponent();
@@ -44,7 +44,7 @@ internal partial class RunWindow
             _boulot = Kernel.Instance.JobProfiles.Jobs[Kernel.Instance.CurrentTask];
             txtTitle.Text = $"Replicas - {_boulot.JobTitle}";
 
-            includeHidden =_boulot.IncludeHidden;
+            _includeHidden =_boulot.IncludeHidden;
             lblPathS.Text =_boulot.SourceFoundDrivePath();
             lblPathD.Text =_boulot.DestinationFoundDrivePath();
             string v =_boulot.SourceVolume;
@@ -64,7 +64,7 @@ internal partial class RunWindow
             lblFolderBalance.Visibility = Visibility.Hidden;
 
             lblLastPerformed.Text =_boulot.PeriodSinceLastRun();
-            if (includeHidden) { lblHidden.Text = "Included"; } else { lblHidden.Text = "Not included"; }
+            if (_includeHidden) { lblHidden.Text = "Included"; } else { lblHidden.Text = "Not included"; }
 
             // report source and destination usage before backup
             long tot = _boulot.SourceSize();
@@ -75,7 +75,7 @@ internal partial class RunWindow
 
             tot =_boulot.DestinationSize();
             fre =_boulot.DestinationFree();
-            freespacebefore = fre;
+            _freespacebefore = fre;
             percentfree = Convert.ToInt32(100 * ((double)fre / tot));
             lblDestinationAfterScope.Text = lblDestinationBeforeScope.Text = $"{Kernel.SizeReport(tot)} total {Kernel.SizeReport(fre)} free ({percentfree}% free)";
             prgDestinationAfter.Value = prgDestinationBefore.Value = 100 - percentfree;
@@ -87,7 +87,7 @@ internal partial class RunWindow
             SwitchImplementationDisplay(false);
             SwitchImplementationErrorsDisplay(false); 
 
-            progressChaser = new Progress<ProgressInfo>(info => { DisplayAnalysisProgress(info); });
+            _progressChaser = new Progress<ProgressInfo>(info => { DisplayAnalysisProgress(info); });
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
@@ -109,7 +109,7 @@ internal partial class RunWindow
 
         private void ImplementUpdate(string SourceRootDir, string DestinationRootDir, ReplicaJobTasks jobs, IProgress<ProgressInfo> prog, CancellationToken cancellationToken)
         {
-            results = new UpdaterResults
+            _results = new UpdaterResults
             {
                 FileAddBytesTarget = jobs.FileAddBulk(),
                 FileUpdBytesTarget = jobs.FileUpdBulk()
@@ -135,7 +135,7 @@ internal partial class RunWindow
                     progressSizeCounter += act.Bulk;
                     progressNumberCounter++;
                     // Remove any attributes from the destination file
-                    FileInfo dFile = new System.IO.FileInfo(act.DestinationPath);
+                    FileInfo dFile = new FileInfo(act.DestinationPath);
                     FileAttributes fileAttribs = dFile.Attributes;
 
                     if ((fileAttribs != 0) && (fileAttribs != FileAttributes.Normal))
@@ -147,14 +147,14 @@ internal partial class RunWindow
                     string faute = Kernel.AttemptToDeleteFile(act.DestinationPath);
                     if (string.IsNullOrEmpty(faute))
                     {
-                        results.FileDelSuccess++;
+                        _results.FileDelSuccess++;
                     }
                     else
                     {
                         act.ErrorText = faute;
-                        results.FileDelFailure++;
+                        _results.FileDelFailure++;
                     }
-                    SendUpdateProgressReport(progressSizeCounter, progressSizeTarget, progressNumberCounter, progressNumberTarget, results, prog, false);
+                    SendUpdateProgressReport(progressSizeCounter, progressSizeTarget, progressNumberCounter, progressNumberTarget, _results, prog, false);
                     if (cancellationToken.IsCancellationRequested) { break; }
                 }
                 if (cancellationToken.IsCancellationRequested) { goto finishing; }
@@ -169,14 +169,14 @@ internal partial class RunWindow
                     string faute = Kernel.AttemptToDeleteDirectory(act.DestinationPath);
                     if (string.IsNullOrEmpty(faute))
                     {
-                        results.DirDelSuccess++;
+                        _results.DirDelSuccess++;
                     }
                     else
                     {
                         act.ErrorText = faute;
-                        results.DirDelFailure++;
+                        _results.DirDelFailure++;
                     }
-                    SendUpdateProgressReport(progressSizeCounter, progressSizeTarget, progressNumberCounter, progressNumberTarget, results, prog, false);
+                    SendUpdateProgressReport(progressSizeCounter, progressSizeTarget, progressNumberCounter, progressNumberTarget, _results, prog, false);
                     if (cancellationToken.IsCancellationRequested) { break; }
                 }
                 if (cancellationToken.IsCancellationRequested) { goto finishing; }
@@ -191,14 +191,14 @@ internal partial class RunWindow
                     string faute = Kernel.AttemptToAddDirectory(act.DestinationPath);
                     if (string.IsNullOrEmpty(faute))
                     {
-                        results.DirAddSuccess++;
+                        _results.DirAddSuccess++;
                     }
                     else
                     {
                         act.ErrorText = faute;
-                        results.DirAddFailure++;
+                        _results.DirAddFailure++;
                     }
-                    SendUpdateProgressReport(progressSizeCounter, progressSizeTarget, progressNumberCounter, progressNumberTarget, results, progressChaser, false);
+                    SendUpdateProgressReport(progressSizeCounter, progressSizeTarget, progressNumberCounter, progressNumberTarget, _results, _progressChaser, false);
                     if (cancellationToken.IsCancellationRequested) { break; }
                 }
                 if (cancellationToken.IsCancellationRequested) { goto finishing; }
@@ -212,8 +212,8 @@ internal partial class RunWindow
                     progressNumberCounter++;
 
                     // Remove any ReadOnly attribute from destination file
-                    System.IO.FileInfo dFile = new System.IO.FileInfo(act.DestinationPath);
-                    System.IO.FileAttributes fileAttribs = dFile.Attributes;
+                    FileInfo dFile = new FileInfo(act.DestinationPath);
+                    FileAttributes fileAttribs = dFile.Attributes;
                     if ((fileAttribs & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
                     {
                         fileAttribs &= ~FileAttributes.ReadOnly; // remove ReadOnly attribute
@@ -222,7 +222,7 @@ internal partial class RunWindow
                     }
 
                     // Remove any Archive attribute from source file
-                    System.IO.FileInfo sFile = new System.IO.FileInfo(act.SourcePath(destinationRoot, sourceRoot));
+                    FileInfo sFile = new FileInfo(act.SourcePath(destinationRoot, sourceRoot));
                     fileAttribs = sFile.Attributes;
                     if ((fileAttribs & FileAttributes.Archive) == FileAttributes.Archive)
                     {
@@ -234,15 +234,15 @@ internal partial class RunWindow
                     string faute = Kernel.AttemptToCopyFile(act.SourcePath(destinationRoot, sourceRoot), act.DestinationPath, overwrite: true);
                     if (string.IsNullOrEmpty(faute))
                     {
-                        results.FileUpdSuccess++;
-                        results.FileUpdBytes += act.Bulk;
+                        _results.FileUpdSuccess++;
+                        _results.FileUpdBytes += act.Bulk;
                     }
                     else
                     {
                         act.ErrorText = "Failed to update file: " + faute;
-                        results.FileUpdFailure++;
+                        _results.FileUpdFailure++;
                     }
-                    SendUpdateProgressReport(progressSizeCounter, progressSizeTarget, progressNumberCounter, progressNumberTarget, results, progressChaser, false);
+                    SendUpdateProgressReport(progressSizeCounter, progressSizeTarget, progressNumberCounter, progressNumberTarget, _results, _progressChaser, false);
                     if (cancellationToken.IsCancellationRequested) { break; }
                 }
                 if (cancellationToken.IsCancellationRequested) { goto finishing; }
@@ -256,7 +256,7 @@ internal partial class RunWindow
                     progressNumberCounter++;
 
                     // Remove any Archive attribute from source file
-                    FileInfo sFile = new System.IO.FileInfo(act.SourcePath(destinationRoot, sourceRoot));
+                    FileInfo sFile = new FileInfo(act.SourcePath(destinationRoot, sourceRoot));
                     FileAttributes fileAttribs = sFile.Attributes;
                     if ((fileAttribs & FileAttributes.Archive) == FileAttributes.Archive)
                     {
@@ -268,52 +268,52 @@ internal partial class RunWindow
                     try
                     {
                         File.Copy(act.SourcePath(destinationRoot, sourceRoot), act.DestinationPath, overwrite: true);
-                        results.FileAddSuccess++;
-                        results.FileAddBytes += act.Bulk;
+                        _results.FileAddSuccess++;
+                        _results.FileAddBytes += act.Bulk;
                     }
                     catch (UnauthorizedAccessException ex)
                     {
                         act.ErrorText = "Failed to add file: " + ex.Message;
-                        results.FileAddFailure++;
+                        _results.FileAddFailure++;
                     }
                     catch (ArgumentException ex)
                     {
                         act.ErrorText = "Failed to add file: " + ex.Message;
-                        results.FileAddFailure++;
+                        _results.FileAddFailure++;
                     }
                     catch (PathTooLongException ex)
                     {
                         act.ErrorText = "Failed to add file: " + ex.Message;
-                        results.FileAddFailure++;
+                        _results.FileAddFailure++;
                     }
                     catch (DirectoryNotFoundException ex)
                     {
                         act.ErrorText = "Failed to add file: " + ex.Message;
-                        results.FileAddFailure++;
+                        _results.FileAddFailure++;
                     }
                     catch (FileNotFoundException ex)
                     {
                         act.ErrorText = "Failed to add file: " + ex.Message;
-                        results.FileAddFailure++;
+                        _results.FileAddFailure++;
                     }
                     catch (IOException ex)
                     {
                         act.ErrorText = "Failed to add file: " + ex.Message;
-                        results.FileAddFailure++;
+                        _results.FileAddFailure++;
                     }
                     catch (NotSupportedException ex)
                     {
                         act.ErrorText = "Failed to add file: " + ex.Message;
-                        results.FileAddFailure++;
+                        _results.FileAddFailure++;
                     }
-                    SendUpdateProgressReport(progressSizeCounter, progressSizeTarget,progressNumberCounter, progressNumberTarget, results, progressChaser, false);
+                    SendUpdateProgressReport(progressSizeCounter, progressSizeTarget,progressNumberCounter, progressNumberTarget, _results, _progressChaser, false);
                     if (cancellationToken.IsCancellationRequested) { break; }
                 }
             }
         finishing:
             // send a final progress report with 'show regardless' flag, to ensure that the final display is up-to-date
-            SendUpdateProgressReport(progressSizeCounter, progressSizeTarget, progressNumberCounter, progressNumberTarget, results, progressChaser, true);
-            if (cancellationToken.IsCancellationRequested) { results.WasCancelled = true; }
+            SendUpdateProgressReport(progressSizeCounter, progressSizeTarget, progressNumberCounter, progressNumberTarget, _results, _progressChaser, true);
+            if (cancellationToken.IsCancellationRequested) { _results.WasCancelled = true; }
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
@@ -328,45 +328,45 @@ internal partial class RunWindow
             buttonCancelUpdate.Visibility = Visibility.Visible;
             DisplayMessage("Updating", waitingInput: false);
             buttonClose.Visibility = Visibility.Collapsed;
-            this.Cursor = Cursors.Wait;
+            Cursor = Cursors.Wait;
             string sd = Kernel.Instance.JobProfiles.Jobs[Kernel.Instance.CurrentTask].SourceFoundDrivePath();
             string dd = Kernel.Instance.JobProfiles.Jobs[Kernel.Instance.CurrentTask].DestinationFoundDrivePath();
 
             // NB This implementation polls CancellationToken.IsCancellationRequested (bool) rather than throwing an error
             // Compare the example in FamilyTree - detectIntramarriages which uses the error method (which Cleary favours)
-            cts = new CancellationTokenSource();
-            CancellationToken token = cts.Token;
-            await Task.Run(() => ImplementUpdate(sd, dd, tasks, progressChaser, token)).ConfigureAwait(true);
+            _cts = new CancellationTokenSource();
+            CancellationToken token = _cts.Token;
+            await Task.Run(() => ImplementUpdate(sd, dd, _tasks, _progressChaser, token)).ConfigureAwait(true);
             Kernel.SoundSignal(600, 500);
-            PostUpdateDisplay(results);
+            PostUpdateDisplay(_results);
         }
 
         private async void Analyse_Click(object sender, RoutedEventArgs e)
         {
             // can be triggered by 'Analyse' button or 'Analyse and Update' button 
-            Button source = sender as Button;
+            Button? source = sender as Button;
             buttonAnalyse.Visibility = Visibility.Collapsed;
             buttonAnalysePlus.Visibility = Visibility.Collapsed;
-            if (source == buttonAnalyse) { runOn = false; } else { runOn = true; }
+            if (source == buttonAnalyse) { _runOn = false; } else { _runOn = true; }
 
-            this.Cursor = Cursors.Wait;
+            Cursor = Cursors.Wait;
             buttonClose.Visibility = Visibility.Collapsed;
             DisplayMessage("Analysing", waitingInput: false);
 
-            ReplicaAnalysis _analysis = new ReplicaAnalysis(SourceRootDir: _boulot.SourceFoundDrivePath(), DestinationRootDir: _boulot.DestinationFoundDrivePath(), IncludeHiddenItems: _boulot.IncludeHidden, ExpectedItemCount: _boulot.ExpectedItemCount, progressChaser);
+            ReplicaAnalysis analysis = new ReplicaAnalysis(SourceRootDir: _boulot.SourceFoundDrivePath(), DestinationRootDir: _boulot.DestinationFoundDrivePath(), IncludeHiddenItems: _boulot.IncludeHidden, ExpectedItemCount: _boulot.ExpectedItemCount, _progressChaser);
 
-            await Task.Run(() => _analysis.PerformAnalysis()).ConfigureAwait(true);
+            await Task.Run(() => analysis.PerformAnalysis()).ConfigureAwait(true);
 
-            _boulot.ExpectedItemCount = _analysis.ExpectedItemCount; // update the expected item count for the job based on this run
+            _boulot.ExpectedItemCount = analysis.ExpectedItemCount; // update the expected item count for the job based on this run
 
-            PostAnalysisDisplay(_analysis);
+            PostAnalysisDisplay(analysis);
             Kernel.SoundSignal(300, 500);
         }
 
         void DisplayAnalysisProgress(ProgressInfo i)
         {
-            char Q = i.Phase;
-            switch (Q)
+            char q = i.Phase;
+            switch (q)
             {
                 case 'S':
                     {
@@ -387,7 +387,7 @@ internal partial class RunWindow
                         progressbarUpdateNumber.Value = i.PercentNumber;
                         textblockProgressUpdateNumber.Text = $"{i.PercentNumber}%";
                         DisplayStatistics(i.Results);
-                        if (results.AnyFailures) { SwitchImplementationErrorsDisplay(true); }
+                        if (_results.AnyFailures) { SwitchImplementationErrorsDisplay(true); }
                         break;
                     }
             }
@@ -397,7 +397,7 @@ internal partial class RunWindow
         {
 
             string root = _boulot.DestinationFoundDrivePath();
-            ActionDetailsWindow w = new ActionDetailsWindow(tasks, root.Length)
+            ActionDetailsWindow w = new ActionDetailsWindow(_tasks, root.Length)
             {
                 Owner = this
             };
@@ -476,64 +476,64 @@ internal partial class RunWindow
             textblockProgressUpdateNumber.Text = string.Empty;
         }
 
-        private void PostAnalysisDisplay(ReplicaAnalysis _anal)
+        private void PostAnalysisDisplay(ReplicaAnalysis replicaAnal)
         {
-            tasks = _anal.JobTaskBundle;
+            _tasks = replicaAnal.JobTaskBundle;
 
-            lblSourceFolders.Text = _anal.SourceDirectories.ToString("N00", CultureInfo.InvariantCulture);
+            lblSourceFolders.Text = replicaAnal.SourceDirectories.ToString("N00", CultureInfo.InvariantCulture);
             lblSourceFolders.Visibility = Visibility.Visible;
             lblSourceFoldersL.Visibility = Visibility.Visible;
-            lblSourceFiles.Text = _anal.SourceFiles.ToString("N00", CultureInfo.InvariantCulture);
+            lblSourceFiles.Text = replicaAnal.SourceFiles.ToString("N00", CultureInfo.InvariantCulture);
             lblSourceFiles.Visibility = Visibility.Visible;
             lblSourceFilesL.Visibility = Visibility.Visible;
 
-            lblDestinFolders.Text = _anal.DestinationDirectories.ToString("N00", CultureInfo.InvariantCulture);
+            lblDestinFolders.Text = replicaAnal.DestinationDirectories.ToString("N00", CultureInfo.InvariantCulture);
             lblDestinFolders.Visibility = Visibility.Visible;
             lblDestinFoldersL.Visibility = Visibility.Visible;
-            lblDestinFiles.Text = _anal.DestinationFiles.ToString("N00", CultureInfo.InvariantCulture);
+            lblDestinFiles.Text = replicaAnal.DestinationFiles.ToString("N00", CultureInfo.InvariantCulture);
             lblDestinFiles.Visibility = Visibility.Visible;
             lblDestinFilesL.Visibility = Visibility.Visible;
 
-            long bal = _anal.DestinationDirectories - _anal.SourceDirectories;
+            long bal = replicaAnal.DestinationDirectories - replicaAnal.SourceDirectories;
             if (bal > 0) { lblFolderBalance.Text = bal.ToString("N00", CultureInfo.InvariantCulture) + " more"; } else { if (bal < 0) { lblFolderBalance.Text = Math.Abs(bal).ToString("N00", CultureInfo.InvariantCulture) + " fewer"; } else { lblFolderBalance.Text = string.Empty; } }
             lblFolderBalance.Visibility = Visibility.Visible;
 
-            bal = _anal.DestinationFiles - _anal.SourceFiles;
+            bal = replicaAnal.DestinationFiles - replicaAnal.SourceFiles;
             if (bal > 0) { lblFileBalance.Text = bal.ToString("N00", CultureInfo.InvariantCulture) + " more"; } else { if (bal < 0) { lblFileBalance.Text = Math.Abs(bal).ToString("N00", CultureInfo.InvariantCulture) + " fewer"; } else { lblFileBalance.Text = string.Empty; } }
             lblFileBalance.Visibility = Visibility.Visible;
 
-            FilesToAddTBk.Text = _anal.JobTaskBundle.TaskCount("FA").ToString(CultureInfo.InvariantCulture);
-            DirectoriesToAddTBk.Text = _anal.JobTaskBundle.TaskCount("DA").ToString(CultureInfo.InvariantCulture);
-            FilesToDeleteTBk.Text = _anal.JobTaskBundle.TaskCount("FD").ToString(CultureInfo.InvariantCulture);
-            DirectoriesToDeleteTBk.Text = _anal.JobTaskBundle.TaskCount("DD").ToString(CultureInfo.InvariantCulture);
-            FilesToUpdateTBk.Text = _anal.JobTaskBundle.TaskCount("FU").ToString(CultureInfo.InvariantCulture);
+            FilesToAddTBk.Text = replicaAnal.JobTaskBundle.TaskCount("FA").ToString(CultureInfo.InvariantCulture);
+            DirectoriesToAddTBk.Text = replicaAnal.JobTaskBundle.TaskCount("DA").ToString(CultureInfo.InvariantCulture);
+            FilesToDeleteTBk.Text = replicaAnal.JobTaskBundle.TaskCount("FD").ToString(CultureInfo.InvariantCulture);
+            DirectoriesToDeleteTBk.Text = replicaAnal.JobTaskBundle.TaskCount("DD").ToString(CultureInfo.InvariantCulture);
+            FilesToUpdateTBk.Text = replicaAnal.JobTaskBundle.TaskCount("FU").ToString(CultureInfo.InvariantCulture);
 
             SwitchImplementationDisplay(true);
 
-            this.Cursor = Cursors.Arrow;
+            Cursor = Cursors.Arrow;
 
             string f = "Some source files are older than the corresponding destination files.\nThis may mean that the destination directory has been updated more recently than the source directory.\nIt could also result from files being renamed.\nAll files of different date or size will be overwritten by source files.\nDo not update unless confident that you want to replace newer files with older.";
-            if (_anal.OlderSourceWarnings.Count > 0)
+            if (replicaAnal.OlderSourceWarnings.Count > 0)
             {
                 WarningsWindow ww = new WarningsWindow();
                 ww.SetCaption("Source older than destination");
                 ww.SetComment(f);
                 ww.lstExamples.Items.Clear();
-                foreach (string g in _anal.OlderSourceWarnings) { ww.lstExamples.Items.Add(g); }
+                foreach (string g in replicaAnal.OlderSourceWarnings) { ww.lstExamples.Items.Add(g); }
                 ww.ShowDialog();
-                runOn = false; // don't automatically run the update if queries have been raised
+                _runOn = false; // don't automatically run the update if queries have been raised
             }
 
-            if (_anal.JobTaskBundle.GrandTotal > 0)
+            if (replicaAnal.JobTaskBundle.GrandTotal > 0)
             {
-                if (_anal.JobTaskBundle.PathAndFilenameLengthsOK())
+                if (replicaAnal.JobTaskBundle.PathAndFilenameLengthsOK())
                 {
                     DisplayMessage("Ready to update", waitingInput: true);
                     buttonUpdate.IsEnabled = true;
                     buttonUpdate.Visibility = Visibility.Visible;
-                    buttonDetail.Tag = _anal.JobTaskBundle;
+                    buttonDetail.Tag = replicaAnal.JobTaskBundle;
                     buttonDetail.Visibility = Visibility.Visible;
-                    if (runOn)
+                    if (_runOn)
                     {
                         LaunchUpdate();
                     }
@@ -606,20 +606,28 @@ internal partial class RunWindow
 
             // report destination usage after backup
             long tot =_boulot.DestinationSize();
-            long fre = _boulot.DestinationFree(); ;
-            int percentfree = Convert.ToInt32(100 * ((double)fre / tot));
-            long freediff = fre - freespacebefore;
-            string freediffreport;
-            if (freediff <= 0) { freediffreport = Kernel.SizeReport(Math.Abs(freediff)) + " less free space"; } else { freediffreport = Kernel.SizeReport(Math.Abs(freediff)) + " more free space"; }
-            lblDestinationAfterScope.Text = $"{Kernel.SizeReport(tot)} total {Kernel.SizeReport(fre)} free ({percentfree}% free) {freediffreport}";
-            prgDestinationAfter.Value = 100 - percentfree;
+            long fre = _boulot.DestinationFree(); 
+            int percentFree = Convert.ToInt32(100 * ((double)fre / tot));
+            long freeDifference = fre - _freespacebefore;
+            string freeDiffReport;
+            if (freeDifference <= 0)
+            {
+                freeDiffReport = Kernel.SizeReport(Math.Abs(freeDifference)) + " less free space";
+            }
+            else
+            {
+                freeDiffReport = Kernel.SizeReport(freeDifference) + " more free space";
+            }
+
+            lblDestinationAfterScope.Text = $"{Kernel.SizeReport(tot)} total {Kernel.SizeReport(fre)} free ({percentFree}% free) {freeDiffReport}";
+            prgDestinationAfter.Value = 100 - percentFree;
             stackpanelafter.Visibility = Visibility.Visible;
 
             buttonDetail.Visibility = Visibility.Visible;
             buttonClose.Content = "Finish";
             buttonClose.Visibility = Visibility.Visible;
             buttonClose.Focus();
-            this.Cursor = Cursors.Arrow;
+            Cursor = Cursors.Arrow;
 
             if (results.AnyFailures)
             {
@@ -627,7 +635,7 @@ internal partial class RunWindow
                 if (MessageBox.Show("There were errors - do you want to view the action details?", "Replicas", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     string root = _boulot.DestinationFoundDrivePath();
-                    ActionDetailsWindow w = new ActionDetailsWindow(tasks, root.Length)
+                    ActionDetailsWindow w = new ActionDetailsWindow(_tasks, root.Length)
                     {
                         Owner = this
                     };
@@ -638,24 +646,24 @@ internal partial class RunWindow
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            cts.Cancel();
+            _cts.Cancel();
             buttonCancelUpdate.IsEnabled = false;
             DisplayMessage("Cancel requested...", waitingInput: false);
         }
 
-        private DateTime lastUpdatePRTime=DateTime.Now;
+        private DateTime _lastUpdatePrTime=DateTime.Now;
 
         private void SendUpdateProgressReport(long progressSizeValue, long progressSizeTarget,int progressNumberValue, int progressNumberTarget, UpdaterResults report, IProgress<ProgressInfo> prog, bool showRegardless)
         {
             DateTime ici = DateTime.Now;
-            TimeSpan ts = ici - lastUpdatePRTime;
+            TimeSpan ts = ici - _lastUpdatePrTime;
             if ((ts.TotalSeconds < 1) && (!showRegardless)) { return; } // don't send another PR within 1 second unless it is the final one
-            lastUpdatePRTime = ici;
-            int ProgressReportSize = Convert.ToInt32(((double)progressSizeValue / progressSizeTarget) * 100);
-            if (ProgressReportSize > 100) { ProgressReportSize = 100; } // don't exceed 100%
-            int ProgressReportNumber = Convert.ToInt32(((double)progressNumberValue / progressNumberTarget) * 100);
-            if (ProgressReportNumber > 100) { ProgressReportNumber = 100; } // don't exceed 100%
-            ProgressInfo info = new ProgressInfo(ProgressReportSize, ProgressReportNumber, 'U', report);
+            _lastUpdatePrTime = ici;
+            int progressReportSize = Convert.ToInt32(((double)progressSizeValue / progressSizeTarget) * 100);
+            if (progressReportSize > 100) { progressReportSize = 100; } // don't exceed 100%
+            int progressReportNumber = Convert.ToInt32(((double)progressNumberValue / progressNumberTarget) * 100);
+            if (progressReportNumber > 100) { progressReportNumber = 100; } // don't exceed 100%
+            ProgressInfo info = new ProgressInfo(progressReportSize, progressReportNumber, 'U', report);
             prog.Report(info);
         }
 
@@ -705,37 +713,4 @@ internal partial class RunWindow
             FileUpdateErrorsTBk.Visibility = vis;
         }
 
-        // public void Dispose()
-        // {
-        //         // Explicitly dispose of resources
-        //         Dispose(true);
-        //         // Tell GC [Garbage Collection] not to finalize us--we've already done it manually
-        //         GC.SuppressFinalize(this);
-        // }
-
-        // // Function called via Dispose method or via Finalizer
-        // protected virtual void Dispose(bool explicitDispose)
-        // {
-        //     if (!disposed)
-        //     {
-        //         // Free some resources only when invoking via Dispose
-        //         if (!(cts is null))
-        //         {
-        //             if (explicitDispose) { cts.Dispose(); }
-        //         }
-        //         
-        //             //FreeManagedResources();   // Define this method
-        //
-        //         // Free unmanaged resources here--whether via Dispose
-        //         //   or via finalizer
-        //         //FreeUnmanagedResources();
-        //
-        //         disposed = true;
-        //     }
-        // }
-        // // Finalizer
-        // ~RunWindow()
-        // {
-        //     Dispose(false);
-        // }
 }

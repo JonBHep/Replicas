@@ -189,8 +189,8 @@ internal partial class FamilyPublishWindow : IDisposable
                 {
                     progressCounter += act.Bulk;
                     // Remove any attributes from the destination file
-                    System.IO.FileInfo dFile = new System.IO.FileInfo(act.DestinationPath);
-                    System.IO.FileAttributes fileAttribs = dFile.Attributes;
+                    FileInfo dFile = new FileInfo(act.DestinationPath);
+                    FileAttributes fileAttribs = dFile.Attributes;
                     
                     if ((fileAttribs != 0) && (fileAttribs != FileAttributes.Normal))
                     {
@@ -264,8 +264,8 @@ internal partial class FamilyPublishWindow : IDisposable
                     progressCounter += act.Bulk;
                     
                     // Remove any ReadOnly attribute from destination file
-                    System.IO.FileInfo dFile = new System.IO.FileInfo(act.DestinationPath);
-                    System.IO.FileAttributes fileAttribs = dFile.Attributes;
+                    FileInfo dFile = new FileInfo(act.DestinationPath);
+                    FileAttributes fileAttribs = dFile.Attributes;
                     if ((fileAttribs & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
                     {
                         fileAttribs &= ~FileAttributes.ReadOnly; // remove ReadOnly attribute
@@ -274,7 +274,7 @@ internal partial class FamilyPublishWindow : IDisposable
                     }
 
                     // Remove any Archive attribute from source file
-                    System.IO.FileInfo sFile = new System.IO.FileInfo(act.SourcePath(destinationRoot, sourceRoot));
+                    FileInfo sFile = new FileInfo(act.SourcePath(destinationRoot, sourceRoot));
                     fileAttribs = sFile.Attributes;
                     if ((fileAttribs & FileAttributes.Archive) == FileAttributes.Archive)
                     {
@@ -306,8 +306,8 @@ internal partial class FamilyPublishWindow : IDisposable
                     progressCounter += act.Bulk;
 
                     // Remove any Archive attribute from source file
-                    System.IO.FileInfo sFile = new System.IO.FileInfo(act.SourcePath(destinationRoot, sourceRoot));
-                    System.IO.FileAttributes fileAttribs = sFile.Attributes;
+                    FileInfo sFile = new FileInfo(act.SourcePath(destinationRoot, sourceRoot));
+                    FileAttributes fileAttribs = sFile.Attributes;
                     if ((fileAttribs & FileAttributes.Archive) == FileAttributes.Archive)
                     {
                         fileAttribs &= ~FileAttributes.Archive; // remove Archive attribute
@@ -317,7 +317,7 @@ internal partial class FamilyPublishWindow : IDisposable
 
                     try
                     { //3//
-                        System.IO.File.Copy(act.SourcePath(destinationRoot, sourceRoot), act.DestinationPath, overwrite: true);
+                        File.Copy(act.SourcePath(destinationRoot, sourceRoot), act.DestinationPath, overwrite: true);
                         results.FileAddSuccess++;
                     } //3//
                     catch (UnauthorizedAccessException ex)
@@ -377,7 +377,7 @@ internal partial class FamilyPublishWindow : IDisposable
             buttonCancelUpdate.Visibility = Visibility.Visible;
             DisplayMessage("Updating", waitingInput: false);
             buttonClose.Visibility = Visibility.Collapsed;
-            this.Cursor = Cursors.Wait;
+            Cursor = Cursors.Wait;
 
             // NB This implementation polls CancellationToken.IsCancellationRequested (bool) rather than throwing an error
             // Compare the example in FamilyTree - detectIntramarriages which uses the error method (which Cleary favours)
@@ -403,7 +403,7 @@ internal partial class FamilyPublishWindow : IDisposable
             buttonAnalysePlus.Visibility = Visibility.Collapsed;
             if (source == buttonAnalyse) { _runOn = false; } else { _runOn = true; }
 
-            this.Cursor = Cursors.Wait;
+            Cursor = Cursors.Wait;
             buttonClose.Visibility = Visibility.Collapsed;
             DisplayMessage("Analysing", waitingInput: false);
 
@@ -507,7 +507,7 @@ internal partial class FamilyPublishWindow : IDisposable
 
             SwitchImplementationDisplay(true);
 
-            this.Cursor = Cursors.Arrow;
+            Cursor = Cursors.Arrow;
 
             string f = "Some source files are older than the corresponding destination files.\nThis may mean that the destination directory has been updated more recently than the source directory.\nIt could also result from files being renamed.\nAll files of different date or size will be overwritten by source files.\nDo not update unless confident that you want to replace newer files with older.";
             if (_anal.OlderSourceWarnings.Count > 0)
@@ -596,7 +596,7 @@ internal partial class FamilyPublishWindow : IDisposable
             buttonClose.Content = "Finish";
             buttonClose.Visibility = Visibility.Visible;
             buttonClose.Focus();
-            this.Cursor = Cursors.Arrow;
+            Cursor = Cursors.Arrow;
 
             if (results.AnyFailures)
             {

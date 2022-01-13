@@ -136,13 +136,13 @@ internal class ReplicaAnalysis
             // whether to include file or directory based on 'Hidden' attribute
             if (_includeHidden) { return true; }
 
-            System.IO.FileAttributes myAttrib;
+            FileAttributes myAttrib;
             if (isdirectory)
-            { myAttrib = new System.IO.DirectoryInfo(filespec).Attributes; }
+            { myAttrib = new DirectoryInfo(filespec).Attributes; }
             else
-            { myAttrib = new System.IO.FileInfo(filespec).Attributes; }
+            { myAttrib = new FileInfo(filespec).Attributes; }
 
-            if (!((myAttrib & System.IO.FileAttributes.Hidden) == FileAttributes.Hidden)) { return true; }
+            if (!((myAttrib & FileAttributes.Hidden) == FileAttributes.Hidden)) { return true; }
             // remaining possibility: file or directory is 'Hidden' and option to include hidden files is not selected
             return false;
         }

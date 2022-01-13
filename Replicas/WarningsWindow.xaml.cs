@@ -10,16 +10,16 @@ internal partial class WarningsWindow : Window
     }
     public void SetCaption(string txt)
     {
-        this.Title = txt;
+        Title = txt;
     }
 
     public void SetComment(string txt)
     {
-        this.lblMessage.Text = txt;
+        lblMessage.Text = txt;
     }
 
     public void AddToList(string txt)
     {
-        this.lstExamples.Items.Add(txt);
+        lstExamples.Items.Add(txt);
     }
 }

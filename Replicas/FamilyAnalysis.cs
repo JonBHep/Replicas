@@ -60,8 +60,8 @@ internal class FamilyAnalysis
         {
             string[] subfiles;
             string[] subfolders;
-            subfiles = System.IO.Directory.GetFiles(BranchRoot);
-            subfolders = System.IO.Directory.GetDirectories(BranchRoot);
+            subfiles = Directory.GetFiles(BranchRoot);
+            subfolders = Directory.GetDirectories(BranchRoot);
             foreach (string thing in subfiles)
             {
                 DestinationFiles++;
@@ -102,7 +102,7 @@ internal class FamilyAnalysis
 
             bool HasContents = false;
 
-            subfolders = System.IO.Directory.GetDirectories(BranchRoot);
+            subfolders = Directory.GetDirectories(BranchRoot);
             // add files to source list unless they are hidden and includeHidden is false
             foreach (string thing in subfiles)
             {
@@ -145,20 +145,20 @@ internal class FamilyAnalysis
             // whether to include file or directory based on 'Hidden' attribute and whether the dir name = Private
             if (isdirectory)
             {
-                string nom = System.IO.Path.GetFileName(filespec);
+                string nom = Path.GetFileName(filespec);
                 if (nom == "Private") { return false; }
             }
-            System.IO.FileAttributes myAttrib;
+            FileAttributes myAttrib;
             if (isdirectory)
             {
-                myAttrib = new System.IO.DirectoryInfo(filespec).Attributes;
+                myAttrib = new DirectoryInfo(filespec).Attributes;
             }
             else
             {
-                myAttrib = new System.IO.FileInfo(filespec).Attributes;
+                myAttrib = new FileInfo(filespec).Attributes;
             }
 
-            if (!((myAttrib & System.IO.FileAttributes.Hidden) == FileAttributes.Hidden)) { return true; }
+            if (!((myAttrib & FileAttributes.Hidden) == FileAttributes.Hidden)) { return true; }
             // remaining possibility: file or directory is 'Hidden' and option to include hidden files is not selected
             return false;
         }
