@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:Replicas"
         mc:Ignorable="d"
-        Title="Action details" Height="300" Width="600" WindowState="Maximized">
+        Title="Action details" Height="300" Width="600" WindowState="Maximized" x:ClassModifier="internal">
     <Window.Resources>
         <DataTemplate x:Key="templateError" >
             <TextBlock Foreground="Red" FontWeight="DemiBold" Text="{Binding ErrorText}"/>

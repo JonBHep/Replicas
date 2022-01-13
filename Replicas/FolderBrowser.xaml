@@ -1,0 +1,84 @@
+﻿<Window x:Class="Replicas.FolderBrowser"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:Replicas"
+        mc:Ignorable="d"
+        Title="Select directory" Height="440" Width="920" Loaded="Window_Loaded" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        x:ClassModifier="internal">
+    <Border  CornerRadius="6" Background="White" BorderBrush="Black" BorderThickness="0.7">
+            <DockPanel Margin="6">
+            <TextBlock DockPanel.Dock="Top" Margin="8" FontWeight="DemiBold">
+                Directory picker
+                <TextBlock.Foreground>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
+                </TextBlock.Foreground>
+            </TextBlock>
+
+            <DockPanel LastChildFill="False" DockPanel.Dock="Top">
+                <DockPanel.Background>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
+                </DockPanel.Background>
+                <TextBlock Margin="8" VerticalAlignment="Center" >DRIVES</TextBlock>
+                <ComboBox Margin="8" MinWidth="100" Name="comboDrives" SelectionChanged="ComboDrives_SelectionChanged"/>
+                <CheckBox Margin="8" Name="chkHidden" FontFamily="Lucida Console" VerticalAlignment="Center" VerticalContentAlignment="Center" Checked="ChkHidden_Checked" Unchecked="ChkHidden_Unchecked" >Show hidden directories</CheckBox>
+                <Button x:Name="buttonSelect" Margin="6" Padding="8,0,8,0" FontWeight="Medium" DockPanel.Dock="Right" Click="ButtonSelect_Click">Select</Button>
+                <Button x:Name="buttonCancel" Margin="6" Padding="8,0,8,0" DockPanel.Dock="Right" Click="ButtonCancel_Click">Cancel</Button>
+            </DockPanel>
+            
+                <DockPanel>
+                
+                <TextBlock Name="textblockPath" DockPanel.Dock="Top" FontFamily="Lucida Console" Foreground="RoyalBlue" VerticalAlignment="Center" FontWeight="Bold" FontSize="15" TextTrimming="CharacterEllipsis" Padding="6 10">Path</TextBlock>
+                    
+                <DockPanel DockPanel.Dock="Top">
+                
+                    <Button Name="buttonUp" Padding="10 6" DockPanel.Dock="Left" Click="ButtonUp_Click" ToolTip="Select parent directory">
+                        <Canvas Height="16" Width="16" >
+                            <Polygon Stroke="Black" StrokeThickness="1">
+                                <Polygon.Fill>
+                                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
+                                </Polygon.Fill>
+                                <Polygon.Points>
+                                    <Point X="8" Y="0"></Point>
+                                    <Point X="16" Y="8"></Point>
+                                    <Point X="11" Y="8"></Point>
+                                    <Point X="11" Y="16"></Point>
+                                    <Point X="5" Y="16"></Point>
+                                    <Point X="5" Y="8"></Point>
+                                    <Point X="0" Y="8"></Point>
+                                </Polygon.Points>
+                            </Polygon>
+                        </Canvas>
+                    </Button>
+                    <Button Name="buttonCreate" Padding="10 6" DockPanel.Dock="Left" Click="ButtonCreate_Click" ToolTip="Create a new directory">
+                        <Canvas Height="16" Width="16" >
+                            <Polygon Stroke="Black" StrokeThickness="1">
+                                <Polygon.Fill>
+                                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
+                                </Polygon.Fill>
+                                <Polygon.Points>
+                                    <Point X="6" Y="0"></Point>
+                                    <Point X="6" Y="6"></Point>
+                                    <Point X="0" Y="6"></Point>
+                                    <Point X="0" Y="10"></Point>
+                                    <Point X="6" Y="10"></Point>
+                                    <Point X="6" Y="16"></Point>
+                                    <Point X="10" Y="16"></Point>
+                                    <Point X="10" Y="10"></Point>
+                                    <Point X="16" Y="10"></Point>
+                                    <Point X="16" Y="6"></Point>
+                                    <Point X="10" Y="6"></Point>
+                                    <Point X="10" Y="0"></Point>
+                                </Polygon.Points>
+                            </Polygon>
+                        </Canvas>
+                    </Button>
+                    <TextBox x:Name="NewDirectoryTextBox" VerticalAlignment="Center" FontFamily="Lucida Console" Margin="4 0 4 0" Padding="2"></TextBox>
+                </DockPanel>
+
+                <ListBox Name="listboxChildren" DockPanel.Dock="Left" FontFamily="Lucida Console" MouseDoubleClick="ListboxChildren_MouseDoubleClick"/>
+                </DockPanel>
+            </DockPanel>
+    </Border>
+</Window>

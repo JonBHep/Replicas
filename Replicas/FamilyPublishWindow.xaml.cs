@@ -11,7 +11,7 @@ using System.Windows.Media;
 
 namespace Replicas;
 
-    public partial class FamilyPublishWindow : IDisposable
+internal partial class FamilyPublishWindow : IDisposable
     {
         private bool disposed;
         private readonly bool _paternity;

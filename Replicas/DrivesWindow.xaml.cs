@@ -7,7 +7,7 @@ using System.Windows.Shapes;
 
 namespace Replicas;
 
-public partial class DrivesWindow : Window
+internal partial class DrivesWindow : Window
 {
     public DrivesWindow()
     {

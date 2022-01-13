@@ -5,7 +5,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:Replicas"
         mc:Ignorable="d"
-        Title="Family publishing" Height="360" Width="900" ShowInTaskbar="False" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" ContentRendered="Window_ContentRendered" Closing="Window_Closing" ResizeMode="NoResize">
+        Title="Family publishing" Height="360" Width="900" ShowInTaskbar="False" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" ContentRendered="Window_ContentRendered" Closing="Window_Closing" ResizeMode="NoResize"
+        x:ClassModifier="internal">
     <Window.Resources>
         <Style x:Key="styHeading" TargetType="{x:Type TextBlock}">
             <Setter Property="Foreground" Value="SaddleBrown"/>

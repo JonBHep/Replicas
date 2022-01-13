@@ -6,7 +6,7 @@ using System.Windows.Media;
 
 namespace Replicas;
 
-public partial class ActionDetailsWindow : Window
+internal partial class ActionDetailsWindow : Window
 {
     public ActionDetailsWindow()
         {
