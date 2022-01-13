@@ -1,0 +1,18 @@
+﻿<Window x:Class="Replicas.WarningsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:Replicas"
+        mc:Ignorable="d"
+        Title="Warnings" Height="300" Width="300" Background="Ivory" Icon="JH Aramis green utility.ico" Topmost="True" WindowStartupLocation="CenterScreen"
+        x:ClassModifier="internal">
+    <Grid d:IsLocked="True">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="lblMessage" Margin="6" TextWrapping="Wrap" Background="Linen" d:IsLocked="True"><Run Text="Message..."/></TextBlock>
+        <ListBox x:Name="lstExamples" Grid.Row="1" Margin="6" d:IsLocked="True"/>
+    </Grid>
+</Window>
