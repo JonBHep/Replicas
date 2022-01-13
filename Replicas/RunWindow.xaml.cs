@@ -13,35 +13,35 @@ namespace Replicas;
 
 internal partial class RunWindow
 {
-    
-    private Tache _boulot;
-        // private bool disposed;
-        private ReplicaJobTasks _tasks;
-        private UpdaterResults _results;
-        private bool _includeHidden;
-        private bool _runOn; // whether to run straight on from analysis to perform the update
-        private long _freespacebefore;
-        internal bool Fulfilled;
-        private Progress<ProgressInfo> _progressChaser;
-        private CancellationTokenSource _cts;
-        internal RunWindow()
-        {
-            InitializeComponent();
-        }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+    private readonly Tache _boulot;
+    private ReplicaJobTasks? _tasks;
+    private UpdaterResults? _results;
+    private bool _includeHidden;
+    private bool _runOn; // whether to run straight on from analysis to perform the update
+    private long _freespacebefore;
+    internal bool Fulfilled;
+    private Progress<ProgressInfo>? _progressChaser;
+    private CancellationTokenSource? _cts;
+
+    internal RunWindow()
+    {
+        InitializeComponent();
+        _boulot = Kernel.Instance.JobProfiles.Jobs[Kernel.Instance.CurrentTask];
+    }
+
+    private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // hide action count labels
 
             stackpanelafter.Visibility = Visibility.Hidden;
-
             DisplayMessage("Ready to analyse", waitingInput: true);
             textblockProgressSource.Text = string.Empty;
             lblFileBalance.Text = "";
             lblFolderBalance.Text = "";
             buttonUpdate.Visibility = Visibility.Collapsed;
             buttonDetail.Visibility = Visibility.Collapsed;
-            _boulot = Kernel.Instance.JobProfiles.Jobs[Kernel.Instance.CurrentTask];
+            
             txtTitle.Text = $"Replicas - {_boulot.JobTitle}";
 
             _includeHidden =_boulot.IncludeHidden;
@@ -107,7 +107,7 @@ internal partial class RunWindow
             e.Cancel = true;
         }
 
-        private void ImplementUpdate(string SourceRootDir, string DestinationRootDir, ReplicaJobTasks jobs, IProgress<ProgressInfo> prog, CancellationToken cancellationToken)
+        private void ImplementUpdate(string sourceRootDir, string destinationRootDir, ReplicaJobTasks jobs, IProgress<ProgressInfo> prog, CancellationToken cancellationToken)
         {
             _results = new UpdaterResults
             {
@@ -115,22 +115,22 @@ internal partial class RunWindow
                 FileUpdBytesTarget = jobs.FileUpdBulk()
             };
 
-            string destinationRoot = DestinationRootDir;
-            string sourceRoot = SourceRootDir;
+            string destinationRoot = destinationRootDir;
+            string sourceRoot = sourceRootDir;
             long progressSizeTarget = jobs.TotalBulk();
             int progressNumberTarget = jobs.GrandTotal;
             long progressSizeCounter = 0;
             int progressNumberCounter = 0;
 
-            List<ReplicaAction> actionlistFD = jobs.TaskList("FD");
-            List<ReplicaAction> actionlistDD = jobs.TaskList("DD");
-            List<ReplicaAction> actionlistDA = jobs.TaskList("DA");
-            List<ReplicaAction> actionlistFU = jobs.TaskList("FU");
-            List<ReplicaAction> actionlistFA = jobs.TaskList("FA");
+            List<ReplicaAction> actionlistFd = jobs.TaskList("FD");
+            List<ReplicaAction> actionlistDd = jobs.TaskList("DD");
+            List<ReplicaAction> actionlistDa = jobs.TaskList("DA");
+            List<ReplicaAction> actionlistFu = jobs.TaskList("FU");
+            List<ReplicaAction> actionlistFa = jobs.TaskList("FA");
 
-            if (actionlistFD.Count > 0)
+            if (actionlistFd.Count > 0)
             {
-                foreach (ReplicaAction act in actionlistFD)
+                foreach (ReplicaAction act in actionlistFd)
                 {
                     progressSizeCounter += act.Bulk;
                     progressNumberCounter++;
@@ -160,9 +160,9 @@ internal partial class RunWindow
                 if (cancellationToken.IsCancellationRequested) { goto finishing; }
             }
 
-            if (actionlistDD.Count > 0)
+            if (actionlistDd.Count > 0)
             {
-                foreach (ReplicaAction act in actionlistDD)
+                foreach (ReplicaAction act in actionlistDd)
                 {
                     progressSizeCounter += act.Bulk;
                     progressNumberCounter++;
@@ -182,9 +182,9 @@ internal partial class RunWindow
                 if (cancellationToken.IsCancellationRequested) { goto finishing; }
             }
 
-            if (actionlistDA.Count > 0)
+            if (actionlistDa.Count > 0)
             {
-                foreach (ReplicaAction act in actionlistDA)
+                foreach (ReplicaAction act in actionlistDa)
                 {
                     progressSizeCounter += act.Bulk;
                     progressNumberCounter++;
@@ -204,9 +204,9 @@ internal partial class RunWindow
                 if (cancellationToken.IsCancellationRequested) { goto finishing; }
             }
 
-            if (actionlistFU.Count > 0)
+            if (actionlistFu.Count > 0)
             {
-                foreach (ReplicaAction act in actionlistFU)
+                foreach (ReplicaAction act in actionlistFu)
                 {
                     progressSizeCounter += act.Bulk;
                     progressNumberCounter++;
@@ -248,9 +248,9 @@ internal partial class RunWindow
                 if (cancellationToken.IsCancellationRequested) { goto finishing; }
             }
 
-            if (actionlistFA.Count > 0)
+            if (actionlistFa.Count > 0)
             {
-                foreach (ReplicaAction act in actionlistFA)
+                foreach (ReplicaAction act in actionlistFa)
                 {
                     progressSizeCounter += act.Bulk;
                     progressNumberCounter++;
@@ -387,7 +387,7 @@ internal partial class RunWindow
                         progressbarUpdateNumber.Value = i.PercentNumber;
                         textblockProgressUpdateNumber.Text = $"{i.PercentNumber}%";
                         DisplayStatistics(i.Results);
-                        if (_results.AnyFailures) { SwitchImplementationErrorsDisplay(true); }
+                        if (_results != null && _results.AnyFailures) { SwitchImplementationErrorsDisplay(true); }
                         break;
                     }
             }
@@ -646,7 +646,7 @@ internal partial class RunWindow
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            _cts.Cancel();
+            _cts?.Cancel();
             buttonCancelUpdate.IsEnabled = false;
             DisplayMessage("Cancel requested...", waitingInput: false);
         }
