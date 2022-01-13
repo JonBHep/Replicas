@@ -11,10 +11,10 @@ using System.Windows.Media;
 
 namespace Replicas;
 
-internal partial class RunWindow : Window
+internal partial class RunWindow
 {
     
-    private Tache boulot;
+    private Tache _boulot;
         // private bool disposed;
         private ReplicaJobTasks tasks;
         private UpdaterResults results;
@@ -41,15 +41,15 @@ internal partial class RunWindow : Window
             lblFolderBalance.Text = "";
             buttonUpdate.Visibility = Visibility.Collapsed;
             buttonDetail.Visibility = Visibility.Collapsed;
-            boulot = Kernel.Instance.JobProfiles.Jobs[Kernel.Instance.CurrentTask];
-            txtTitle.Text = "Replicate - " +boulot.JobTitle;
+            _boulot = Kernel.Instance.JobProfiles.Jobs[Kernel.Instance.CurrentTask];
+            txtTitle.Text = $"Replicas - {_boulot.JobTitle}";
 
-            includeHidden =boulot.IncludeHidden;
-            lblPathS.Text =boulot.SourceFoundDrivePath();
-            lblPathD.Text =boulot.DestinationFoundDrivePath();
-            string v =boulot.SourceVolume;
+            includeHidden =_boulot.IncludeHidden;
+            lblPathS.Text =_boulot.SourceFoundDrivePath();
+            lblPathD.Text =_boulot.DestinationFoundDrivePath();
+            string v =_boulot.SourceVolume;
             lblDriveS.Text = Kernel.Instance.KnownDrives.VolumeDescription(v) + " (" + v + ")";
-            v =boulot.DestinationVolume;
+            v =_boulot.DestinationVolume;
             lblDriveD.Text = Kernel.Instance.KnownDrives.VolumeDescription(v) + " (" + v + ")";
 
             lblSourceFilesL.Visibility = Visibility.Hidden;
@@ -63,18 +63,18 @@ internal partial class RunWindow : Window
             lblFileBalance.Visibility = Visibility.Hidden;
             lblFolderBalance.Visibility = Visibility.Hidden;
 
-            lblLastPerformed.Text =boulot.PeriodSinceLastRun();
+            lblLastPerformed.Text =_boulot.PeriodSinceLastRun();
             if (includeHidden) { lblHidden.Text = "Included"; } else { lblHidden.Text = "Not included"; }
 
             // report source and destination usage before backup
-            long tot = boulot.SourceSize();
-            long fre =boulot.SourceFree();
+            long tot = _boulot.SourceSize();
+            long fre =_boulot.SourceFree();
             int percentfree = Convert.ToInt32(100 * ((double)fre / tot));
             lblSourceScope.Text = $"{Kernel.SizeReport(tot)} total {Kernel.SizeReport(fre)} free ({percentfree}% free)";
             prgSource.Value = 100 - percentfree;
 
-            tot =boulot.DestinationSize();
-            fre =boulot.DestinationFree();
+            tot =_boulot.DestinationSize();
+            fre =_boulot.DestinationFree();
             freespacebefore = fre;
             percentfree = Convert.ToInt32(100 * ((double)fre / tot));
             lblDestinationAfterScope.Text = lblDestinationBeforeScope.Text = $"{Kernel.SizeReport(tot)} total {Kernel.SizeReport(fre)} free ({percentfree}% free)";
@@ -353,11 +353,11 @@ internal partial class RunWindow : Window
             buttonClose.Visibility = Visibility.Collapsed;
             DisplayMessage("Analysing", waitingInput: false);
 
-            ReplicaAnalysis _analysis = new ReplicaAnalysis(SourceRootDir: boulot.SourceFoundDrivePath(), DestinationRootDir: boulot.DestinationFoundDrivePath(), IncludeHiddenItems: boulot.IncludeHidden, ExpectedItemCount: boulot.ExpectedItemCount, progressChaser);
+            ReplicaAnalysis _analysis = new ReplicaAnalysis(SourceRootDir: _boulot.SourceFoundDrivePath(), DestinationRootDir: _boulot.DestinationFoundDrivePath(), IncludeHiddenItems: _boulot.IncludeHidden, ExpectedItemCount: _boulot.ExpectedItemCount, progressChaser);
 
             await Task.Run(() => _analysis.PerformAnalysis()).ConfigureAwait(true);
 
-            boulot.ExpectedItemCount = _analysis.ExpectedItemCount; // update the expected item count for the job based on this run
+            _boulot.ExpectedItemCount = _analysis.ExpectedItemCount; // update the expected item count for the job based on this run
 
             PostAnalysisDisplay(_analysis);
             Kernel.SoundSignal(300, 500);
@@ -396,7 +396,7 @@ internal partial class RunWindow : Window
         private void LogButton_Click(object sender, RoutedEventArgs e)
         {
 
-            string root = boulot.DestinationFoundDrivePath();
+            string root = _boulot.DestinationFoundDrivePath();
             ActionDetailsWindow w = new ActionDetailsWindow(tasks, root.Length)
             {
                 Owner = this
@@ -605,8 +605,8 @@ internal partial class RunWindow : Window
             }
 
             // report destination usage after backup
-            long tot =boulot.DestinationSize();
-            long fre = boulot.DestinationFree(); ;
+            long tot =_boulot.DestinationSize();
+            long fre = _boulot.DestinationFree(); ;
             int percentfree = Convert.ToInt32(100 * ((double)fre / tot));
             long freediff = fre - freespacebefore;
             string freediffreport;
@@ -626,7 +626,7 @@ internal partial class RunWindow : Window
                 SwitchImplementationErrorsDisplay(true);
                 if (MessageBox.Show("There were errors - do you want to view the action details?", "Replicas", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    string root = boulot.DestinationFoundDrivePath();
+                    string root = _boulot.DestinationFoundDrivePath();
                     ActionDetailsWindow w = new ActionDetailsWindow(tasks, root.Length)
                     {
                         Owner = this

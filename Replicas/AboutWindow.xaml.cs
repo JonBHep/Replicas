@@ -8,7 +8,7 @@ public partial class AboutWindow : Window
     {
         InitializeComponent();
     }
-
+// TODO Design this window
     private void CloseButton_OnClick(object sender, RoutedEventArgs e)
     {
         DialogResult = false;

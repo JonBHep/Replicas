@@ -40,7 +40,7 @@
                 <RowDefinition Height="200"/>
             </Grid.RowDefinitions>
             <TextBlock VerticalAlignment="Top" Margin="12 0 0 0" FontFamily="AR Julian" FontSize="32"  >
-                REPLICATE - backup manager
+                REPLICAS - backup manager
                 <TextBlock.Foreground>
                     <LinearGradientBrush StartPoint="0.5, 0" EndPoint="0.5 1">
                         <GradientStopCollection>
