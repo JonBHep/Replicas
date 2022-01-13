@@ -9,4 +9,8 @@
         <NeutralLanguage>en-GB</NeutralLanguage>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Compile Remove="ReplicaJJobTasks.cs" />
+    </ItemGroup>
+
 </Project>
