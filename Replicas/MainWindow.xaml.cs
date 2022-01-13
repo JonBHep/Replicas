@@ -227,7 +227,7 @@ namespace Replicas
 
         private void InfoButton_Click(object sender, RoutedEventArgs e)
         {
-            Jbh.AboutWindow w = new Jbh.AboutWindow()
+            AboutWindow w = new AboutWindow()
             {
                 Owner = this
             };
