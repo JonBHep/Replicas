@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows;
 
 namespace Replicas;
 
@@ -60,8 +61,10 @@ internal class ReplicaAnalysis
         {
             string[] subfiles;
             string[] subfolders;
-            subfiles = Directory.GetFiles(BranchRoot);  // TODO set a Try-Catch here
+            
+            subfiles = Directory.GetFiles(BranchRoot);
             subfolders = Directory.GetDirectories(BranchRoot);
+            
             foreach (string thing in subfiles)
             {
                 DestinationFiles++;

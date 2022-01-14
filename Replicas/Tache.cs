@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Replicas;
 
@@ -135,7 +136,22 @@ internal class Tache : IComparable<Tache>
         else
         {
             var pathOnFoundDrive = l + SourcePath[1..];
-            return System.IO.Directory.Exists(pathOnFoundDrive) ? pathOnFoundDrive : string.Empty;
+            if (!Directory.Exists(pathOnFoundDrive))
+            {
+                return string.Empty;
+            }
+            // NOTE additional test because an encrypted HDD attached for too long will become inaccessible but still return Directory.Exists as true
+            
+            bool testedOk = true;
+            try
+            {
+                string[] ff = Directory.GetFiles(pathOnFoundDrive);
+            }
+            catch (Exception e)
+            {
+                testedOk = false;
+            }
+            return testedOk ? pathOnFoundDrive : string.Empty;
         }
     }
 
@@ -160,8 +176,22 @@ internal class Tache : IComparable<Tache>
             {
                 return string.Empty;
             }
-            var pathOnFoundDrive = l + DestinationPath.Substring(1);
-            return System.IO.Directory.Exists(pathOnFoundDrive) ? pathOnFoundDrive : string.Empty;
+            var pathOnFoundDrive = l + DestinationPath[1..];
+            if (!Directory.Exists((pathOnFoundDrive)))
+            {
+                return string.Empty;
+            }
+// NOTE additional test because an encrypted HDD attached for too long will become inaccessible but still return Directory.Exists as true
+            bool testedOk = true;
+            try
+            {
+                string[] ff = Directory.GetFiles(pathOnFoundDrive);
+            }
+            catch (Exception e)
+            {
+                testedOk = false;
+            }
+            return testedOk ? pathOnFoundDrive : string.Empty;
         }
     }
 

@@ -68,7 +68,9 @@ internal class DetectedDrives
                                 Size = drv.TotalSize,
                                 UsedPercent = (int)Math.Round((drv.TotalSize - drv.AvailableFreeSpace) / (double)drv.TotalSize * 100)
                             };
+                            
                             _trove.Add(dv);
+                            
                         }
                     }
                 }
