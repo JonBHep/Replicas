@@ -39,13 +39,13 @@
                                     <SolidColorBrush Color="{StaticResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
                                 </Polygon.Fill>
                                 <Polygon.Points>
-                                    <Point X="8" Y="0"></Point>
-                                    <Point X="16" Y="8"></Point>
-                                    <Point X="11" Y="8"></Point>
-                                    <Point X="11" Y="16"></Point>
-                                    <Point X="5" Y="16"></Point>
-                                    <Point X="5" Y="8"></Point>
-                                    <Point X="0" Y="8"></Point>
+                                    <Point X="8" Y="0" />
+                                    <Point X="16" Y="8" />
+                                    <Point X="11" Y="8" />
+                                    <Point X="11" Y="16" />
+                                    <Point X="5" Y="16" />
+                                    <Point X="5" Y="8" />
+                                    <Point X="0" Y="8" />
                                 </Polygon.Points>
                             </Polygon>
                         </Canvas>
@@ -57,23 +57,23 @@
                                     <SolidColorBrush Color="{StaticResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
                                 </Polygon.Fill>
                                 <Polygon.Points>
-                                    <Point X="6" Y="0"></Point>
-                                    <Point X="6" Y="6"></Point>
-                                    <Point X="0" Y="6"></Point>
-                                    <Point X="0" Y="10"></Point>
-                                    <Point X="6" Y="10"></Point>
-                                    <Point X="6" Y="16"></Point>
-                                    <Point X="10" Y="16"></Point>
-                                    <Point X="10" Y="10"></Point>
-                                    <Point X="16" Y="10"></Point>
-                                    <Point X="16" Y="6"></Point>
-                                    <Point X="10" Y="6"></Point>
-                                    <Point X="10" Y="0"></Point>
+                                    <Point X="6" Y="0" />
+                                    <Point X="6" Y="6" />
+                                    <Point X="0" Y="6" />
+                                    <Point X="0" Y="10" />
+                                    <Point X="6" Y="10" />
+                                    <Point X="6" Y="16" />
+                                    <Point X="10" Y="16" />
+                                    <Point X="10" Y="10" />
+                                    <Point X="16" Y="10" />
+                                    <Point X="16" Y="6" />
+                                    <Point X="10" Y="6" />
+                                    <Point X="10" Y="0" />
                                 </Polygon.Points>
                             </Polygon>
                         </Canvas>
                     </Button>
-                    <TextBox x:Name="NewDirectoryTextBox" VerticalAlignment="Center" FontFamily="Lucida Console" Margin="4 0 4 0" Padding="2"></TextBox>
+                    <TextBox x:Name="NewDirectoryTextBox" VerticalAlignment="Center" FontFamily="Lucida Console" Margin="4 0 4 0" Padding="2" />
                 </DockPanel>
 
                 <ListBox Name="ListboxChildren" DockPanel.Dock="Left" FontFamily="Lucida Console" MouseDoubleClick="ListboxChildren_MouseDoubleClick"/>

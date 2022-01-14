@@ -8,7 +8,7 @@ internal class ReplicaJobs
 {
     internal Dictionary<string, Tache> Jobs;
 
-        private readonly string _dataFileJobs = System.IO.Path.Combine(Jbh.AppManager.DataPath, "Jobs.jobs");
+        // private readonly string _dataFileJobs = System.IO.Path.Combine(Jbh.AppManager.DataPath, "Jobs.jobs");
         private readonly string _dataFileTasks = System.IO.Path.Combine(Jbh.AppManager.DataPath, "Tasks.jht");
 
         private void LoadProfile()
@@ -17,79 +17,106 @@ internal class ReplicaJobs
             if (!System.IO.File.Exists(_dataFileTasks)) return;
             using (System.IO.StreamReader sr = new System.IO.StreamReader(_dataFileTasks))
             {
-                Tache boulot=new Tache();
+                Tache boulot = new Tache();
                 while (!sr.EndOfStream)
                 {
-                    string dat = sr.ReadLine();
-                        int p = dat.IndexOf(':');
-                        if (p > 0) // ignores blank line
-                        {
+                    string? dat = sr.ReadLine();
+                    if (dat is not { }) continue;
+                    int p = dat.IndexOf(':');
+                    if (p > 0) // ignores blank line
+                    {
                         string itemTag = dat.Substring(0, p);
                         string itemContent = dat.Substring(p + 1);
                         switch (itemTag)
                         {
                             case "Job":
-                                {
-                                    boulot = new Tache() { Key = itemContent };
-                                    Jobs.Add(boulot.Key, boulot);
-                                    break;
-                                }
-                            case "JobTitle": { boulot.JobTitle = itemContent; break; }
-                            case "SourcePath": { boulot.SourcePath = itemContent; break; }
-                            case "SourceVolume": { boulot.SourceVolume = itemContent; break; }
-                            case "DestinationPath": { boulot.DestinationPath = itemContent; break; }
-                            case "DestinationVolume": { boulot.DestinationVolume = itemContent; break; }
+                            {
+                                boulot = new Tache() {Key = itemContent};
+                                Jobs.Add(boulot.Key, boulot);
+                                break;
+                            }
+                            case "JobTitle":
+                            {
+                                boulot.JobTitle = itemContent;
+                                break;
+                            }
+                            case "SourcePath":
+                            {
+                                boulot.SourcePath = itemContent;
+                                break;
+                            }
+                            case "SourceVolume":
+                            {
+                                boulot.SourceVolume = itemContent;
+                                break;
+                            }
+                            case "DestinationPath":
+                            {
+                                boulot.DestinationPath = itemContent;
+                                break;
+                            }
+                            case "DestinationVolume":
+                            {
+                                boulot.DestinationVolume = itemContent;
+                                break;
+                            }
                             case "LastDate":
+                            {
+                                if (DateTime.TryParse(itemContent, CultureInfo.InvariantCulture, DateTimeStyles.None
+                                        , out DateTime dt))
                                 {
-                                    if (DateTime.TryParse(itemContent,CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt))
-                                    {
-                                        boulot.LastDate = dt;
-                                    }
-                                    break;
+                                    boulot.LastDate = dt;
                                 }
+
+                                break;
+                            }
                             case "IncludeHidden":
+                            {
+                                if (bool.TryParse(itemContent, out bool si))
                                 {
-                                    if (bool.TryParse(itemContent, out bool si))
-                                    {
-                                        boulot.IncludeHidden = si;
-                                    }
-                                    break;
+                                    boulot.IncludeHidden = si;
                                 }
+
+                                break;
+                            }
                             case "Dangerous":
+                            {
+                                if (bool.TryParse(itemContent, out bool si))
                                 {
-                                    if (bool.TryParse(itemContent, out bool si))
-                                    {
-                                        boulot.Dangerous = si;
-                                    }
-                                    break;
+                                    boulot.Dangerous = si;
                                 }
+
+                                break;
+                            }
                             case "IsJbhInfo":
+                            {
+                                if (bool.TryParse(itemContent, out bool si))
                                 {
-                                    if (bool.TryParse(itemContent, out bool si))
-                                    {
-                                        boulot.IsJbhInfoBackup = si;
-                                    }
-                                    break;
+                                    boulot.IsJbhInfoBackup = si;
                                 }
+
+                                break;
+                            }
                             case "IsJbhBusiness":
+                            {
+                                if (bool.TryParse(itemContent, out bool si))
                                 {
-                                    if (bool.TryParse(itemContent, out bool si))
-                                    {
-                                        boulot.IsJbhBusinessBackup = si;
-                                    }
-                                    break;
+                                    boulot.IsJbhBusinessBackup = si;
                                 }
+
+                                break;
+                            }
                             case "ExpectedItemCount":
+                            {
+                                if (long.TryParse(itemContent, out long ct))
                                 {
-                                    if (long.TryParse(itemContent, out long ct))
-                                    {
-                                        boulot.ExpectedItemCount = ct;
-                                    }
-                                    break;
+                                    boulot.ExpectedItemCount = ct;
                                 }
+
+                                break;
+                            }
                         }
-                        }
-                    
+                    }
                 }
             }
         }
@@ -174,8 +201,8 @@ internal class ReplicaJobs
                 {
                     DateTime d = j.LastDate;
                     string sorter = d.ToString(sortformat, CultureInfo.InvariantCulture);
-                    string dateshow = d.ToString("d MMM yyyy a\\t HH:mm", CultureInfo.InvariantCulture);
-                    string nm = j.JobTitle;
+                    var dateshow = d.ToString("d MMM yyyy a\\t HH:mm", CultureInfo.InvariantCulture);
+                    var nm = j.JobTitle;
                     string all = sorter + dateshow + "^" + nm + "^" + Kernel.HowLongAgo(d);
                     templist.Add(all);
                 }
@@ -199,8 +226,8 @@ internal class ReplicaJobs
                     DateTime d = j.LastDate;
                     string sorter = d.ToString(sortformat, CultureInfo.InvariantCulture);
                     string dateshow = d.ToString("d MMM yyyy a\\t HH:mm", CultureInfo.InvariantCulture);
-                    string nm = j.JobTitle;
-                    string all = sorter + dateshow + "^" + nm + "^" + Kernel.HowLongAgo(d);
+                    var nm = j.JobTitle;
+                    string all =$"{sorter}{dateshow}^{nm}^{Kernel.HowLongAgo((d))}";
                     templist.Add(all);
                 }
                 templist.Sort();

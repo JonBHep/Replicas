@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:Replicas"
         mc:Ignorable="d"
         Title="Replicate" WindowStyle="None" AllowsTransparency="True" Background="Transparent" Height="600" Width="1100" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing" ContentRendered="Window_ContentRendered" SizeToContent="Height"
         x:ClassModifier="internal">
@@ -39,14 +38,14 @@
             <Setter Property="Value" Value="33"/>
             <Setter Property="Width" Value="100"/>
             <Setter Property="Height" Value="8"/>
-            <Setter Property="Margin" Value="0 3 0 0"></Setter>
+            <Setter Property="Margin" Value="0 3 0 0" />
         </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="48"></RowDefinition>
-            <RowDefinition Height="18"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="48" />
+            <RowDefinition Height="18" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Border CornerRadius="16" BorderBrush="SaddleBrown" BorderThickness="2" Background="LightYellow">
             <TextBlock x:Name="txtTitle" FontSize="16" Foreground="Teal" VerticalAlignment="Center" Margin="24 0 0 0">xxx</TextBlock>

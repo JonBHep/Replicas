@@ -14,7 +14,14 @@ internal class DetectedDrives
             public string VolumeLabel;
             public string RootDir;
             public long Size;
-            public int UsedPcnt;
+            public int UsedPercent;
+
+            public FoundDisk()
+            {
+                DriveLetter = null;
+                VolumeLabel = string.Empty;
+                RootDir = string.Empty;
+            }
         }
 
         private readonly List<FoundDisk> _trove = new List<FoundDisk>();
@@ -42,10 +49,9 @@ internal class DetectedDrives
 
         private void Refresh()
         {
-            FoundDisk dv;
             _trove.Clear();
-            System.IO.DriveInfo[] FoundDrives = System.IO.DriveInfo.GetDrives();
-            foreach (System.IO.DriveInfo drv in FoundDrives)
+            System.IO.DriveInfo[] foundDrives = System.IO.DriveInfo.GetDrives();
+            foreach (System.IO.DriveInfo drv in foundDrives)
             {
                 if (!drv.Name.StartsWith("A",StringComparison.OrdinalIgnoreCase))
                 {
@@ -54,13 +60,13 @@ internal class DetectedDrives
                         if (drv.IsReady)
                         {
                             string rd = drv.RootDirectory.FullName;
-                            dv = new FoundDisk()
+                            var dv = new FoundDisk()
                             {
                                 DriveLetter = drv.Name.ElementAt(0),
                                 VolumeLabel = drv.VolumeLabel,
                                 RootDir = rd,
                                 Size = drv.TotalSize,
-                                UsedPcnt = (int)Math.Round((drv.TotalSize - drv.AvailableFreeSpace) / (double)drv.TotalSize * 100)
+                                UsedPercent = (int)Math.Round((drv.TotalSize - drv.AvailableFreeSpace) / (double)drv.TotalSize * 100)
                             };
                             _trove.Add(dv);
                         }
@@ -76,9 +82,11 @@ internal class DetectedDrives
                     path = System.IO.Path.Combine(path, "jbhDriveId.txt");
                     if (System.IO.File.Exists(path))
                     {
-                        using (System.IO.StreamReader sr = new System.IO.StreamReader(path))
+                        using var sr = new System.IO.StreamReader(path);
+                        string? read = sr.ReadLine();
+                        if (read is { })
                         {
-                            l.VolumeLabel = sr.ReadLine();
+                            l.VolumeLabel = read;    
                         }
                     }
                     if (string.IsNullOrWhiteSpace(l.VolumeLabel)) // no predefined label
@@ -174,7 +182,7 @@ internal class DetectedDrives
             {
                 int u = 0;
                 foreach (FoundDisk t in _trove)
-                { if (t.DriveLetter == driveLetter) { u = t.UsedPcnt; } }
+                { if (t.DriveLetter == driveLetter) { u = t.UsedPercent; } }
                 return u;
             }
         }

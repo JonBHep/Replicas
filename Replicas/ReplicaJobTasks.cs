@@ -100,18 +100,18 @@ internal class ReplicaJobTasks
 
             list.Sort();
 
-            //reverse the sort for directory deletion to ensure hierachical deletion
+            //reverse the sort for directory deletion to ensure hierarchical deletion
             if (code.Equals("DD", StringComparison.OrdinalIgnoreCase)) { list.Reverse(); } // 'sort' followed by 'reverse' is required, as 'reverse' reverses the order without sorting
             return list;
         }
 
-        internal bool PathAndFilenameLengthsOK()
+        internal bool PathAndFilenameLengthsOk()
         {
             bool anyProblem = false;
 
             foreach (ReplicaAction thing in _masterActionList.Values)
             {
-                string f = thing.DestinationPath;
+                var f = thing.DestinationPath;
                 if (f.Length >= 260)
                 {
                     thing.ErrorText = "Filename with path >= 260 characters: " + f;
@@ -120,23 +120,15 @@ internal class ReplicaJobTasks
                 else
                 {
                     f = System.IO.Path.GetDirectoryName(f);
-                    if (f.Length >= 248)
-                    {
-                        thing.ErrorText = "Directory path >= 248 characters: " + f;
-                        anyProblem = true;
-                    }
+                    if (f is null || f.Length < 248) continue;
+                    thing.ErrorText = "Directory path >= 248 characters: " + f;
+                    anyProblem = true;
                 }
             }
             return !anyProblem;
         }
 
-        internal int GrandTotal
-        {
-            get
-            {
-                return _masterActionList.Count;
-            }
-        }
+        internal int GrandTotal => _masterActionList.Count;
 
         private int FreshKey
         {

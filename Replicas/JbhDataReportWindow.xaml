@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:Replicas"
         mc:Ignorable="d"
         Title="Jbh.Info backups report" Height="800" Width="800" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" WindowStyle="None" ContentRendered="Window_ContentRendered">
 
@@ -16,8 +15,8 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <DockPanel LastChildFill="False" Background="SaddleBrown">
-            <TextBlock x:Name="tbkHeading" VerticalAlignment="Center" Margin="8 0" Foreground="Ivory" FontWeight="Bold">Jbh.Info and Jbh.Business backups</TextBlock>
-            <TextBlock x:Name="tbkRubric" VerticalAlignment="Center" Margin="8 0" Foreground="AntiqueWhite">Most recent first</TextBlock>
+            <TextBlock x:Name="TextBlockHeading" VerticalAlignment="Center" Margin="8 0" Foreground="Ivory" FontWeight="Bold">Jbh.Info and Jbh.Business backups</TextBlock>
+            <TextBlock x:Name="TextBlockRubric" VerticalAlignment="Center" Margin="8 0" Foreground="AntiqueWhite">Most recent first</TextBlock>
             <Button Style="{StaticResource styleButtonNorm}" DockPanel.Dock="Right" Width="60" VerticalAlignment="Center" Margin="0 0 4 0" IsCancel="True">Close</Button>
         </DockPanel>
         
@@ -25,13 +24,10 @@
             <TextBlock x:Name="InfoLabel" Foreground="Ivory" VerticalAlignment="Center" Margin="8 0" FontWeight="Bold" >Jbh.Info backups</TextBlock>
         </DockPanel>
         
-        <ItemsControl x:Name="InfoItemsControl" Grid.Row="2" Background="LightYellow" Padding="8" Margin="3 0 3 0">
-        
-        </ItemsControl>
+        <ItemsControl x:Name="InfoItemsControl" Grid.Row="2" Background="LightYellow" Padding="8" Margin="3 0 3 0" />
         <DockPanel x:Name="BusinessPanel" Grid.Row="3" Background="ForestGreen" LastChildFill="False" >
             <TextBlock x:Name="BusinessLabel" Foreground="Ivory" VerticalAlignment="Center" Margin="8 0" FontWeight="Bold"  >Jbh.Business backups</TextBlock>
         </DockPanel>
-        <ItemsControl x:Name="BusinessItemsControl" Grid.Row="4" Background="LightYellow" Padding="8" Margin="3 0 3 3">
-        </ItemsControl>
+        <ItemsControl x:Name="BusinessItemsControl" Grid.Row="4" Background="LightYellow" Padding="8" Margin="3 0 3 3" />
     </Grid>
 </Window>

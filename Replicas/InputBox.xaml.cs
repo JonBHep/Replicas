@@ -3,21 +3,21 @@ using System.Windows;
 
 namespace Replicas;
 
-public partial class InputBox : Window
+public partial class InputBox
 {
     public InputBox()
     {
         InitializeComponent();
     }
-    public InputBox(string BoxTitle, string PromptText, string DefaultResponse)
+    public InputBox(string boxTitle, string promptText, string defaultResponse)
     {
         InitializeComponent();
-        Title = BoxTitle;
-        textblockPrompt.Text = PromptText;
-        textboxResponse.Text = DefaultResponse;
+        Title = boxTitle;
+        TextBlockPrompt.Text = promptText;
+        TextBoxResponse.Text = defaultResponse;
     }
 
-    public string ResponseText { get { return textboxResponse.Text; } }
+    public string ResponseText => TextBoxResponse.Text;
 
     private void buttonOkay_Click(object sender, RoutedEventArgs e)
     {
@@ -32,6 +32,6 @@ public partial class InputBox : Window
     private void Window_ContentRendered(object sender, EventArgs e)
     {
         Icon = Owner.Icon;
-        textboxResponse.Focus();
+        TextBoxResponse.Focus();
     }
 }

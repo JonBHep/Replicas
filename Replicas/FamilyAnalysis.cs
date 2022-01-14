@@ -16,15 +16,15 @@ internal class FamilyAnalysis
         private int _lastProgressReport = 100;
         private readonly IProgress<ProgressInfo> _progressor;
 
-        public FamilyAnalysis(string SourceRootDir, string DestinationRootDir, long ExpectedItemCount, Progress<ProgressInfo> prog)//constructor
+        public FamilyAnalysis(string sourceRootDir, string destinationRootDir, long expectedItemCount, Progress<ProgressInfo> prog)//constructor
         {
             DestinationDirectories = 0;
             DestinationFiles = 0;
             SourceDirectories = 0;
             SourceFiles = 0;
-            _sourceRoot = SourceRootDir;
-            _destinationRoot = DestinationRootDir;
-            this.ExpectedItemCount = ExpectedItemCount;
+            _sourceRoot = sourceRootDir;
+            _destinationRoot = destinationRootDir;
+            this.ExpectedItemCount = expectedItemCount;
             if (this.ExpectedItemCount == 0) { this.ExpectedItemCount = 100; }
             JobTaskBundle = new ReplicaJobTasks();
             _progressor = prog;
@@ -56,12 +56,12 @@ internal class FamilyAnalysis
             SelectActionItems();
         }
 
-        private void BranchDestination(string BranchRoot)
+        private void BranchDestination(string branchRoot)
         {
             string[] subfiles;
             string[] subfolders;
-            subfiles = Directory.GetFiles(BranchRoot);
-            subfolders = Directory.GetDirectories(BranchRoot);
+            subfiles = Directory.GetFiles(branchRoot);
+            subfolders = Directory.GetDirectories(branchRoot);
             foreach (string thing in subfiles)
             {
                 DestinationFiles++;
@@ -89,26 +89,26 @@ internal class FamilyAnalysis
             }
         }
 
-        private bool BranchSource(string BranchRoot)
+        private bool BranchSource(string branchRoot)
         {
             string[] subfiles;
             string[] subfolders;
 
-            subfiles = Kernel.AttemptToGetFiles(BranchRoot, out string faute);
+            subfiles = Kernel.AttemptToGetFiles(branchRoot, out string faute);
             if (!string.IsNullOrEmpty(faute))
             { 
-                System.Windows.MessageBox.Show(faute + "\nSkipping corrupted or protected directory\n" + BranchRoot,Jbh.AppManager.AppName+ " (ScanFolder)", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Asterisk); return false; 
+                System.Windows.MessageBox.Show(faute + "\nSkipping corrupted or protected directory\n" + branchRoot,Jbh.AppManager.AppName+ " (ScanFolder)", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Asterisk); return false; 
             }
 
-            bool HasContents = false;
+            bool hasContents = false;
 
-            subfolders = Directory.GetDirectories(BranchRoot);
+            subfolders = Directory.GetDirectories(branchRoot);
             // add files to source list unless they are hidden and includeHidden is false
             foreach (string thing in subfiles)
             {
                 if (NotHiding(filespec: thing, isdirectory: false))
                 {
-                    HasContents = true;
+                    hasContents = true;
                     SourceFiles++;
                     _runningItemCount++;
                     SendProgressReport(_runningItemCount, ExpectedItemCount, 'S', _progressor);
@@ -125,7 +125,7 @@ internal class FamilyAnalysis
                     if (BranchSource(thing))
                     {
                         // only record this folder if it has contents (not counting a Private subfolder)
-                        HasContents = true;
+                        hasContents = true;
                         SourceDirectories++;
                         _runningItemCount++;
 
@@ -137,7 +137,7 @@ internal class FamilyAnalysis
                 }
             }
 
-            return HasContents;
+            return hasContents;
         }
 
         private static bool NotHiding(string filespec, bool isdirectory)
@@ -259,13 +259,13 @@ internal class FamilyAnalysis
         private void SendProgressReport(long progressValue, long progressTarget, char phase, IProgress<ProgressInfo> progress)
         {
             if (progressTarget == 0) { progressTarget = 100; }// avoid overflow errors
-            int ProgressReport = Convert.ToInt32(((double)progressValue / progressTarget) * 100);
-            if (ProgressReport > 100) { ProgressReport = 100; } // don't exceed 100%
-            if (ProgressReport != _lastProgressReport)
+            int progressReport = Convert.ToInt32(((double)progressValue / progressTarget) * 100);
+            if (progressReport > 100) { progressReport = 100; } // don't exceed 100%
+            if (progressReport != _lastProgressReport)
             {
-                ProgressInfo info = new ProgressInfo(0, ProgressReport, phase, null);
+                var info = new ProgressInfo(0, progressReport, phase, null);
                 progress.Report(info);
-                _lastProgressReport = ProgressReport;
+                _lastProgressReport = progressReport;
             }
         }
 }

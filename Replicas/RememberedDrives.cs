@@ -14,16 +14,17 @@ internal class RememberedDrives
         {
             if (System.IO.File.Exists(_drivesDataFile))
             {
-                using (System.IO.StreamReader sr = new System.IO.StreamReader(_drivesDataFile))
+                using System.IO.StreamReader sr = new System.IO.StreamReader(_drivesDataFile);
+                RecognisedDrives.Clear();
+                while (!sr.EndOfStream)
                 {
-                    RecognisedDrives.Clear();
-                    //RememberedDrive kl;
-                    while (!sr.EndOfStream)
+                    string? read = sr.ReadLine();
+                    if (read is { })
                     {
-                        RecognisedDrives.Add(new RememberedDrive() { Specification = sr.ReadLine() });
+                        RecognisedDrives.Add(new RememberedDrive() {Specification = read});
                     }
-                    RecognisedDrives.Sort();
                 }
+                RecognisedDrives.Sort();
             }
         }
 
@@ -48,12 +49,10 @@ internal class RememberedDrives
         {
             Jbh.AppManager.CreateBackupDataFile(_drivesDataFile);
             Jbh.AppManager.PurgeOldBackups("jbhd", 20, 20);
-            using (System.IO.StreamWriter sw = new System.IO.StreamWriter(_drivesDataFile))
+            using var sw = new System.IO.StreamWriter(_drivesDataFile);
+            foreach (var kl in RecognisedDrives)
             {
-                foreach (RememberedDrive kl in RecognisedDrives)
-                {
-                    sw.WriteLine(kl.Specification);
-                }
+                sw.WriteLine(kl.Specification);
             }
         }
 
@@ -97,23 +96,29 @@ internal class RememberedDrives
             return when.ToString("ddd dd MMM yyyy @ HH:mm", CultureInfo.CurrentCulture);
         }
 
-        internal string VolumeDescription(string driveLabel)
+        internal string VolumeDescription(string? driveLabel)
         {
-            int n = RememberedDriveIndex(driveLabel);
-            if (n >= 0)
-            { return RecognisedDrives[n].MyDescription; }
-            else
-            { return "No description"; }
+            if (driveLabel is { })
+            {
+                int n = RememberedDriveIndex(driveLabel);
+                if (n >= 0)
+                {
+                    return RecognisedDrives[n].MyDescription;
+                }
+                else
+                {
+                    return "No description";
+                }
+            }
+            return "No description";
         }
 
         internal void RefreshDriveList()
         {
-            string driveLabel;
-            int n;
             foreach(Tache t in Kernel.Instance.JobProfiles.Jobs.Values)
             {
-                driveLabel =t.SourceVolume;
-                n = RememberedDriveIndex(driveLabel);
+                var driveLabel = t.SourceVolume;
+                var n = RememberedDriveIndex(driveLabel);
                 if (n < 0)
                 {
                     RememberedDrive klt = new RememberedDrive()

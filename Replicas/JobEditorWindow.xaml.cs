@@ -3,17 +3,17 @@ using System.Windows;
 
 namespace Replicas;
 
-internal partial class JobEditorWindow : Window
+internal partial class JobEditorWindow
 {
     internal JobEditorWindow()
     {
         InitializeComponent();
     }
-    internal string AaTitle;
-        internal string AaSourcePath;
-        internal string AaSourceVolume;
-        internal string AaDestinationPath;
-        internal string AaDestinationVolume;
+    internal string? AaTitle;
+        internal string? AaSourcePath;
+        internal string? AaSourceVolume;
+        internal string? AaDestinationPath;
+        internal string? AaDestinationVolume;
         internal bool AaIncludeHiddenFiles;
         internal bool AaDangerous;
         internal bool AaIsJbhInfoBackup;
@@ -31,13 +31,13 @@ internal partial class JobEditorWindow : Window
         {
             AaIsJbhInfoBackup = JbhInfoRadioButton.IsChecked.HasValue && JbhInfoRadioButton.IsChecked.Value;
             AaIsJbhBusinessBackup = JbhBusinessRadioButton.IsChecked.HasValue && JbhBusinessRadioButton.IsChecked.Value;
-            AaDestinationPath = lblDestinationPath.Text;
-            AaDestinationVolume = lblDestinationVolume.Text;
-            AaIncludeHiddenFiles = chkHidden.IsChecked.Value;
-            AaDangerous = DangerousCheckBox.IsChecked.Value;
-            AaSourcePath = lblSourcePath.Text;
-            AaSourceVolume = lblSourceVolume.Text;
-            AaTitle = lblTitle.Text;
+            AaDestinationPath = LblDestinationPath.Text;
+            AaDestinationVolume = LblDestinationVolume.Text;
+            AaIncludeHiddenFiles =ChkHidden.IsChecked.HasValue && ChkHidden.IsChecked.Value;
+            AaDangerous =DangerousCheckBox.IsChecked.HasValue && DangerousCheckBox.IsChecked.Value;
+            AaSourcePath = LblSourcePath.Text;
+            AaSourceVolume = LblSourceVolume.Text;
+            AaTitle = LblTitle.Text;
             DialogResult = true;
         }
 
@@ -45,28 +45,28 @@ internal partial class JobEditorWindow : Window
         {
             get
             {
-                bool b = !(lblTitle.Text == "?");
+                bool b = LblTitle.Text != "?";
 
-                if (lblDestinationPath.Text == "?") { b = false; }
-                if (lblDestinationVolume.Text == "?") { b = false; }
-                if (lblSourcePath.Text == "?") { b = false; }
-                if (lblSourceVolume.Text == "?") { b = false; }
-                if (string.IsNullOrWhiteSpace(lblTitle.Text)) { b = false; }
-                if (string.IsNullOrWhiteSpace(lblDestinationPath.Text)) { b = false; }
-                if (string.IsNullOrWhiteSpace(lblDestinationVolume.Text)) { b = false; }
-                if (string.IsNullOrWhiteSpace(lblSourcePath.Text)) { b = false; }
-                if (string.IsNullOrWhiteSpace(lblSourceVolume.Text)) { b = false; }
+                if (LblDestinationPath.Text == "?") { b = false; }
+                if (LblDestinationVolume.Text == "?") { b = false; }
+                if (LblSourcePath.Text == "?") { b = false; }
+                if (LblSourceVolume.Text == "?") { b = false; }
+                if (string.IsNullOrWhiteSpace(LblTitle.Text)) { b = false; }
+                if (string.IsNullOrWhiteSpace(LblDestinationPath.Text)) { b = false; }
+                if (string.IsNullOrWhiteSpace(LblDestinationVolume.Text)) { b = false; }
+                if (string.IsNullOrWhiteSpace(LblSourcePath.Text)) { b = false; }
+                if (string.IsNullOrWhiteSpace(LblSourceVolume.Text)) { b = false; }
                 return b;
             }
         }
 
         private void TitleButton_Click(object sender, RoutedEventArgs e)
         {
-            InputBox ib = new InputBox("Job title", "Give this backup job a title", lblTitle.Text) { Owner = this };
+            InputBox ib = new InputBox("Job title", "Give this backup job a title", LblTitle.Text) { Owner = this };
             if (ib.ShowDialog() == true)
             {
-                lblTitle.Text = ib.ResponseText;
-                btnOkay.IsEnabled = OkToEnd;
+                LblTitle.Text = ib.ResponseText;
+                BtnOkay.IsEnabled = OkToEnd;
             }
         }
 
@@ -75,11 +75,11 @@ internal partial class JobEditorWindow : Window
             FolderBrowser fb = new FolderBrowser();
             if (fb.ShowDialog() == true)
             {
-                lblSourcePath.Text = fb.SelectedDirectory;
-                string dlabel = Kernel.Instance.DrivesCurrentlyFound.DriveVolumeLabel(lblSourcePath.Text.ElementAt(0));
-                lblSourceVolume.Text = dlabel;
-                lblSourceVolumeDescription.Text = Kernel.Instance.KnownDrives.VolumeDescription(dlabel);
-                btnOkay.IsEnabled = OkToEnd;
+                LblSourcePath.Text = fb.SelectedDirectory;
+                string dlabel = Kernel.Instance.DrivesCurrentlyFound.DriveVolumeLabel(LblSourcePath.Text.ElementAt(0));
+                LblSourceVolume.Text = dlabel;
+                LblSourceVolumeDescription.Text = Kernel.Instance.KnownDrives.VolumeDescription(dlabel);
+                BtnOkay.IsEnabled = OkToEnd;
             }
         }
 
@@ -88,11 +88,11 @@ internal partial class JobEditorWindow : Window
             FolderBrowser fb = new FolderBrowser();
             if (fb.ShowDialog() == true)
             {
-                lblDestinationPath.Text = fb.SelectedDirectory;
-                string dlabel = Kernel.Instance.DrivesCurrentlyFound.DriveVolumeLabel(lblDestinationPath.Text.ElementAt(0));
-                lblDestinationVolume.Text = dlabel;
-                lblDestinationVolumeDescription.Text = Kernel.Instance.KnownDrives.VolumeDescription(dlabel);
-                btnOkay.IsEnabled = OkToEnd;
+                LblDestinationPath.Text = fb.SelectedDirectory;
+                string dlabel = Kernel.Instance.DrivesCurrentlyFound.DriveVolumeLabel(LblDestinationPath.Text.ElementAt(0));
+                LblDestinationVolume.Text = dlabel;
+                LblDestinationVolumeDescription.Text = Kernel.Instance.KnownDrives.VolumeDescription(dlabel);
+                BtnOkay.IsEnabled = OkToEnd;
             }
         }
 
@@ -100,13 +100,13 @@ internal partial class JobEditorWindow : Window
         {
             if (AaTitle == "?")
             {
-                lblDestinationPath.Text = "?";
-                lblDestinationVolume.Text = "?";
-                lblSourcePath.Text = "?";
-                lblSourceVolume.Text = "?";
-                lblSpace.Text = "";
-                lblTitle.Text = "?";
-                chkHidden.IsChecked = true;
+                LblDestinationPath.Text = "?";
+                LblDestinationVolume.Text = "?";
+                LblSourcePath.Text = "?";
+                LblSourceVolume.Text = "?";
+                LblSpace.Text = "";
+                LblTitle.Text = "?";
+                ChkHidden.IsChecked = true;
                 JbhInfoRadioButton.IsChecked = false;
                 JbhBusinessRadioButton.IsChecked = false;
                 OtherRadioButton.IsChecked = true;
@@ -114,15 +114,15 @@ internal partial class JobEditorWindow : Window
             }
             else
             {
-                lblDestinationPath.Text = AaDestinationPath;
-                lblDestinationVolume.Text = AaDestinationVolume;
-                lblDestinationVolumeDescription.Text = Kernel.Instance.KnownDrives.VolumeDescription(AaDestinationVolume);
-                lblSourcePath.Text = AaSourcePath;
-                lblSourceVolume.Text = AaSourceVolume;
-                lblSourceVolumeDescription.Text = Kernel.Instance.KnownDrives.VolumeDescription(AaSourceVolume);
-                lblSpace.Text = "";
-                lblTitle.Text = AaTitle;
-                chkHidden.IsChecked = AaIncludeHiddenFiles;
+                LblDestinationPath.Text = AaDestinationPath;
+                LblDestinationVolume.Text = AaDestinationVolume;
+                LblDestinationVolumeDescription.Text = Kernel.Instance.KnownDrives.VolumeDescription(AaDestinationVolume);
+                LblSourcePath.Text = AaSourcePath;
+                LblSourceVolume.Text = AaSourceVolume;
+                LblSourceVolumeDescription.Text = Kernel.Instance.KnownDrives.VolumeDescription(AaSourceVolume);
+                LblSpace.Text = "";
+                LblTitle.Text = AaTitle;
+                ChkHidden.IsChecked = AaIncludeHiddenFiles;
                 DangerousCheckBox.IsChecked = AaDangerous;
                 OtherRadioButton.IsChecked = true;
                 JbhInfoRadioButton.IsChecked = AaIsJbhInfoBackup;
@@ -130,11 +130,11 @@ internal partial class JobEditorWindow : Window
                 Title = "Backup job details";
                 if (Inaccessible)
                 {
-                    lblSpace.Text = "Free space on destination drive: inaccessible";
+                    LblSpace.Text = "Free space on destination drive: inaccessible";
                 }
                 else
                 {
-                    lblSpace.Text = "Free space on destination drive: " + DriveFreeReport;
+                    LblSpace.Text = "Free space on destination drive: " + DriveFreeReport;
                 }
             }
         }
@@ -164,11 +164,11 @@ internal partial class JobEditorWindow : Window
 
         private void DatabankCheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            btnOkay.IsEnabled = OkToEnd;
+            BtnOkay.IsEnabled = OkToEnd;
         }
         
         private void DangerousCheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            btnOkay.IsEnabled = OkToEnd;
+            BtnOkay.IsEnabled = OkToEnd;
         }
 }

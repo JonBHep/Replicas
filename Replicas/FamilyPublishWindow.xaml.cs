@@ -11,22 +11,24 @@ using System.Windows.Media;
 
 namespace Replicas;
 
-internal partial class FamilyPublishWindow : IDisposable
+internal partial class FamilyPublishWindow
     {
-        private bool disposed;
         private readonly bool _paternity;
-        private string _sourceFolder;
-        private string _targetFolder;
+        private string? _sourceFolder;
+        private string? _targetFolder;
         private long _expectedCount;
-        UpdaterResults results;
-        private string _sourceFolderMat;
-        private string _targetFolderMat;
+        UpdaterResults? _results;
+        private string? _sourceFolderMat;
+        private string? _targetFolderMat;
         private long _expectedCountMat;
-        private string _sourceFolderPat;
-        private string _targetFolderPat;
+        private string? _sourceFolderPat;
+        private string? _targetFolderPat;
         private long _expectedCountPat;
-        private Progress<ProgressInfo> _progressChaser;
-        private CancellationTokenSource _cts;
+        private Progress<ProgressInfo>? _progressChaser;
+        private CancellationTokenSource? _cts;
+        private ReplicaJobTasks? _tasks;
+        private int _lastUpdateProgressReport;
+        private bool _runOn; // whether to run straight on from analysis to perform the update
 
         public FamilyPublishWindow(bool pat)
         {
@@ -126,21 +128,18 @@ internal partial class FamilyPublishWindow : IDisposable
             }
         }
 
-        private ReplicaJobTasks _tasks;
-        private int _lastUpdateProgressReport;
-        private bool _runOn; // whether to run straight on from analysis to perform the update
-        internal bool Fulfilled;
+        
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             DisplayMessage("Ready to analyse", waitingInput: true);
-            textblockProgressSource.Text = string.Empty;
-            buttonUpdate.Visibility = Visibility.Collapsed;
-            buttonDetail.Visibility = Visibility.Collapsed;
+            TextBlockProgressSource.Text = string.Empty;
+            ButtonUpdate.Visibility = Visibility.Collapsed;
+            ButtonDetail.Visibility = Visibility.Collapsed;
 
-            buttonClose.Visibility = Visibility.Visible;
-            buttonClose.Content = "Cancel";
-            buttonCancelUpdate.Visibility = Visibility.Collapsed;
+            ButtonClose.Visibility = Visibility.Visible;
+            ButtonClose.Content = "Cancel";
+            ButtonCancelUpdate.Visibility = Visibility.Collapsed;
 
             SwitchImplementationDisplay(false);
             SwitchImplementationErrorsDisplay(false);
@@ -150,7 +149,7 @@ internal partial class FamilyPublishWindow : IDisposable
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            if (buttonUpdate.IsVisible)
+            if (ButtonUpdate.IsVisible)
             {
                 if (MessageBox.Show("You have not performed the update\n\nClose anyway?", "Replicate", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) { Close(); }
             }
@@ -160,7 +159,7 @@ internal partial class FamilyPublishWindow : IDisposable
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (buttonClose.Visibility != Visibility.Visible)
+            if (ButtonClose.Visibility != Visibility.Visible)
             {
                 MessageBox.Show("JBH: I am not allowing window closure because the Close button is not visible", "Replicate", MessageBoxButton.OK, MessageBoxImage.Warning);
                 e.Cancel = true;
@@ -171,7 +170,7 @@ internal partial class FamilyPublishWindow : IDisposable
 
         private void ImplementUpdate(string SourceRootDir, string DestinationRootDir, ReplicaJobTasks jobs, IProgress<ProgressInfo> prog, CancellationToken cancellationToken)
         {
-            results = new UpdaterResults();
+            _results = new UpdaterResults();
             string destinationRoot = DestinationRootDir;
             string sourceRoot = SourceRootDir;
             long progressTarget = jobs.TotalBulk();
@@ -201,15 +200,15 @@ internal partial class FamilyPublishWindow : IDisposable
                     string faute = Kernel.AttemptToDeleteFile(act.DestinationPath);
                     if (string.IsNullOrEmpty(faute))
                     {
-                        results.FileDelSuccess++;
+                        _results.FileDelSuccess++;
                     }
                     else
                     {
                         act.ErrorText = faute;
-                        results.FileDelFailure++;
+                        _results.FileDelFailure++;
                     }
 
-                    SendUpdateProgressReport(progressCounter, progressTarget, results, prog);
+                    SendUpdateProgressReport(progressCounter, progressTarget, _results, prog);
                     if (cancellationToken.IsCancellationRequested) { break; }
                 }
                 if (cancellationToken.IsCancellationRequested) { goto finishing; }
@@ -223,14 +222,14 @@ internal partial class FamilyPublishWindow : IDisposable
                     string faute = Kernel.AttemptToDeleteDirectory(act.DestinationPath);
                     if (string.IsNullOrEmpty(faute))
                     {
-                        results.DirDelSuccess++;
+                        _results.DirDelSuccess++;
                     }
                     else
                     {
                         act.ErrorText = faute;
-                        results.DirDelFailure++;
+                        _results.DirDelFailure++;
                     }
-                    SendUpdateProgressReport(progressCounter, progressTarget, results, prog);
+                    SendUpdateProgressReport(progressCounter, progressTarget, _results, prog);
                     if (cancellationToken.IsCancellationRequested) { break; }
                 }
                 if (cancellationToken.IsCancellationRequested) { goto finishing; }
@@ -244,14 +243,14 @@ internal partial class FamilyPublishWindow : IDisposable
                     string faute = Kernel.AttemptToAddDirectory(act.DestinationPath);
                     if (string.IsNullOrEmpty(faute))
                     {
-                        results.DirAddSuccess++;
+                        _results.DirAddSuccess++;
                     }
                     else
                     {
                         act.ErrorText =faute;
-                        results.DirAddFailure++;
+                        _results.DirAddFailure++;
                     }
-                    SendUpdateProgressReport(progressCounter, progressTarget, results, prog);
+                    SendUpdateProgressReport(progressCounter, progressTarget, _results, prog);
                     if (cancellationToken.IsCancellationRequested) { break; }
                 }
                 if (cancellationToken.IsCancellationRequested) { goto finishing; }
@@ -286,14 +285,14 @@ internal partial class FamilyPublishWindow : IDisposable
                     string faute = Kernel.AttemptToCopyFile(act.SourcePath(destinationRoot, sourceRoot), act.DestinationPath, overwrite: true);
                     if (string.IsNullOrEmpty(faute))
                     {
-                        results.FileUpdSuccess++;
+                        _results.FileUpdSuccess++;
                     }
                     else
                     {
                         act.ErrorText = "Failed to update file: " + faute;
-                        results.FileUpdFailure++;
+                        _results.FileUpdFailure++;
                     }
-                    SendUpdateProgressReport(progressCounter, progressTarget, results, prog);
+                    SendUpdateProgressReport(progressCounter, progressTarget, _results, prog);
                     if (cancellationToken.IsCancellationRequested) { break; }
                 }
                 if (cancellationToken.IsCancellationRequested) { goto finishing; }
@@ -318,51 +317,51 @@ internal partial class FamilyPublishWindow : IDisposable
                     try
                     { //3//
                         File.Copy(act.SourcePath(destinationRoot, sourceRoot), act.DestinationPath, overwrite: true);
-                        results.FileAddSuccess++;
+                        _results.FileAddSuccess++;
                     } //3//
                     catch (UnauthorizedAccessException ex)
                     {
                         act.ErrorText = "Failed to add file: " + ex.Message;
-                        results.FileAddFailure++;
+                        _results.FileAddFailure++;
                     }
                     catch (ArgumentException ex)
                     {
                         act.ErrorText = "Failed to add file: " + ex.Message;
-                        results.FileAddFailure++;
+                        _results.FileAddFailure++;
                     }
                     catch (PathTooLongException ex)
                     {
                         act.ErrorText = "Failed to add file: " + ex.Message;
-                        results.FileAddFailure++;
+                        _results.FileAddFailure++;
                     }
                     catch (DirectoryNotFoundException ex)
                     {
                         act.ErrorText = "Failed to add file: " + ex.Message;
-                        results.FileAddFailure++;
+                        _results.FileAddFailure++;
                     }
                     catch (FileNotFoundException ex)
                     {
                         act.ErrorText = "Failed to add file: " + ex.Message;
-                        results.FileAddFailure++;
+                        _results.FileAddFailure++;
                     }
                     catch (IOException ex)
                     {
                         act.ErrorText = "Failed to add file: " + ex.Message;
-                        results.FileAddFailure++;
+                        _results.FileAddFailure++;
                     }
                     catch (NotSupportedException ex)
                     {
                         act.ErrorText = "Failed to add file: " + ex.Message;
-                        results.FileAddFailure++;
+                        _results.FileAddFailure++;
                     }
-                    SendUpdateProgressReport(progressCounter, progressTarget, results, prog);
+                    SendUpdateProgressReport(progressCounter, progressTarget, _results, prog);
                     if (cancellationToken.IsCancellationRequested) { break; }
                 }
             }
         finishing:
             // send a final progress report to ensure that the final display is up-to-date
-            SendUpdateProgressReport(progressCounter, progressTarget, results, prog);
-            if (cancellationToken.IsCancellationRequested) { results.WasCancelled = true; }
+            SendUpdateProgressReport(progressCounter, progressTarget, _results, prog);
+            if (cancellationToken.IsCancellationRequested) { _results.WasCancelled = true; }
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
@@ -372,11 +371,11 @@ internal partial class FamilyPublishWindow : IDisposable
 
         private async void LaunchUpdate()
         {
-            buttonUpdate.Visibility = Visibility.Collapsed;
-            buttonDetail.Visibility = Visibility.Collapsed;
-            buttonCancelUpdate.Visibility = Visibility.Visible;
+            ButtonUpdate.Visibility = Visibility.Collapsed;
+            ButtonDetail.Visibility = Visibility.Collapsed;
+            ButtonCancelUpdate.Visibility = Visibility.Visible;
             DisplayMessage("Updating", waitingInput: false);
-            buttonClose.Visibility = Visibility.Collapsed;
+            ButtonClose.Visibility = Visibility.Collapsed;
             Cursor = Cursors.Wait;
 
             // NB This implementation polls CancellationToken.IsCancellationRequested (bool) rather than throwing an error
@@ -385,7 +384,7 @@ internal partial class FamilyPublishWindow : IDisposable
             CancellationToken token = _cts.Token;
             await Task.Run(() => ImplementUpdate(_sourceFolder, _targetFolder, _tasks, _progressChaser, token)).ConfigureAwait(true);
             Kernel.SoundSignal(600, 500);
-            PostUpdateDisplay(results);
+            PostUpdateDisplay(_results);
 
         }
 
@@ -399,15 +398,15 @@ internal partial class FamilyPublishWindow : IDisposable
                 return;
             }
             Button source = sender as Button;
-            buttonAnalyse.Visibility = Visibility.Collapsed;
-            buttonAnalysePlus.Visibility = Visibility.Collapsed;
-            if (source == buttonAnalyse) { _runOn = false; } else { _runOn = true; }
+            ButtonAnalyse.Visibility = Visibility.Collapsed;
+            ButtonAnalysePlus.Visibility = Visibility.Collapsed;
+            if (source == ButtonAnalyse) { _runOn = false; } else { _runOn = true; }
 
             Cursor = Cursors.Wait;
-            buttonClose.Visibility = Visibility.Collapsed;
+            ButtonClose.Visibility = Visibility.Collapsed;
             DisplayMessage("Analysing", waitingInput: false);
 
-            FamilyAnalysis _analysis = new FamilyAnalysis(SourceRootDir: _sourceFolder, DestinationRootDir: _targetFolder, ExpectedItemCount: _expectedCount, _progressChaser);
+            FamilyAnalysis _analysis = new FamilyAnalysis(sourceRootDir: _sourceFolder, destinationRootDir: _targetFolder, expectedItemCount: _expectedCount, _progressChaser);
 
             await Task.Run(() => _analysis.PerformAnalysis()).ConfigureAwait(true);
 
@@ -429,8 +428,8 @@ internal partial class FamilyPublishWindow : IDisposable
 
         private void DisplayMessage(string phase, bool waitingInput)
         {
-            if (waitingInput) { textblockMessage.Foreground = Brushes.DarkRed; } else { textblockMessage.Foreground = Brushes.ForestGreen; }
-            textblockMessage.Text = phase;
+            if (waitingInput) { TextBlockMessage.Foreground = Brushes.DarkRed; } else { TextBlockMessage.Foreground = Brushes.ForestGreen; }
+            TextBlockMessage.Text = phase;
         }
 
         private void SetFonts()
@@ -483,14 +482,14 @@ internal partial class FamilyPublishWindow : IDisposable
 
             SetFonts();
 
-            progressbarSource.Value = 0;
-            textblockProgressSource.Text = string.Empty;
+            ProgressbarSource.Value = 0;
+            TextBlockProgressSource.Text = string.Empty;
 
-            progressbarDestination.Value = 0;
-            textblockProgressDestination.Text = string.Empty;
+            ProgressbarDestination.Value = 0;
+            TextBlockProgressDestination.Text = string.Empty;
 
-            progressbarUpdate.Value = 0;
-            textblockProgressUpdate.Text = string.Empty;
+            ProgressbarUpdate.Value = 0;
+            TextBlockProgressUpdate.Text = string.Empty;
 
            
         }
@@ -515,46 +514,44 @@ internal partial class FamilyPublishWindow : IDisposable
                 WarningsWindow ww = new WarningsWindow();
                 ww.SetCaption("Source older than destination");
                 ww.SetComment(f);
-                ww.lstExamples.Items.Clear();
-                foreach (string g in _anal.OlderSourceWarnings) { ww.lstExamples.Items.Add(g); }
+                ww.LstExamples.Items.Clear();
+                foreach (string g in _anal.OlderSourceWarnings) { ww.LstExamples.Items.Add(g); }
                 ww.ShowDialog();
                 _runOn = false; // don't automatically run the update if queries have been raised
             }
 
             if (_anal.JobTaskBundle.GrandTotal > 0)
             {
-                if (_anal.JobTaskBundle.PathAndFilenameLengthsOK())
+                if (_anal.JobTaskBundle.PathAndFilenameLengthsOk())
                 {
                     DisplayMessage("Ready to update", waitingInput: true);
-                    buttonUpdate.IsEnabled = true;
-                    buttonUpdate.Visibility = Visibility.Visible;
-                    buttonDetail.Tag = _anal.JobTaskBundle;
-                    buttonDetail.Visibility = Visibility.Visible;
+                    ButtonUpdate.IsEnabled = true;
+                    ButtonUpdate.Visibility = Visibility.Visible;
+                    ButtonDetail.Tag = _anal.JobTaskBundle;
+                    ButtonDetail.Visibility = Visibility.Visible;
                     if (_runOn)
                     {
                         LaunchUpdate();
                     }
                     else
                     {
-                        buttonClose.Content = "Cancel";
-                        buttonClose.Visibility = Visibility.Visible;
+                        ButtonClose.Content = "Cancel";
+                        ButtonClose.Visibility = Visibility.Visible;
                     }
                 }
                 else
                 {
                     DisplayMessage("Filename or path lengths exceeded", waitingInput: true);
-                    Fulfilled = false;
-                    buttonDetail.Visibility = Visibility.Visible;
-                    buttonClose.Content = "Close";
-                    buttonClose.Visibility = Visibility.Visible;
+                    ButtonDetail.Visibility = Visibility.Visible;
+                    ButtonClose.Content = "Close";
+                    ButtonClose.Visibility = Visibility.Visible;
                 }
             }
             else
             {
                 DisplayMessage("Nothing to do!", waitingInput: true);
-                Fulfilled = true;
-                buttonClose.Content = "Close";
-                buttonClose.Visibility = Visibility.Visible;
+                ButtonClose.Content = "Close";
+                ButtonClose.Visibility = Visibility.Visible;
             }
         }
 
@@ -578,7 +575,7 @@ internal partial class FamilyPublishWindow : IDisposable
 
         private void PostUpdateDisplay(UpdaterResults results)
         {
-            buttonCancelUpdate.Visibility = Visibility.Collapsed;
+            ButtonCancelUpdate.Visibility = Visibility.Collapsed;
 
             DisplayStatistics(results);
 
@@ -588,14 +585,13 @@ internal partial class FamilyPublishWindow : IDisposable
             }
             else
             {
-                Fulfilled = true;
                 DisplayMessage("Finished", waitingInput: true);
             }
 
-            buttonDetail.Visibility = Visibility.Visible;
-            buttonClose.Content = "Finish";
-            buttonClose.Visibility = Visibility.Visible;
-            buttonClose.Focus();
+            ButtonDetail.Visibility = Visibility.Visible;
+            ButtonClose.Content = "Finish";
+            ButtonClose.Visibility = Visibility.Visible;
+            ButtonClose.Focus();
             Cursor = Cursors.Arrow;
 
             if (results.AnyFailures)
@@ -616,7 +612,7 @@ internal partial class FamilyPublishWindow : IDisposable
         private void CancelUpdateButton_Click(object sender, RoutedEventArgs e)
         {
             _cts.Cancel();
-            buttonCancelUpdate.IsEnabled = false;
+            ButtonCancelUpdate.IsEnabled = false;
             DisplayMessage("Cancel requested...", waitingInput: false);
         }
 
@@ -628,11 +624,11 @@ internal partial class FamilyPublishWindow : IDisposable
             ActionsToDoTBk.Visibility = vis;
             ActionsDoneTBk.Visibility = vis;
 
-            lblActionFD.Visibility = vis;
-            lblActionDD.Visibility = vis;
-            lblActionDA.Visibility = vis;
-            lblActionFA.Visibility = vis;
-            lblActionFU.Visibility = vis;
+            LblActionFd.Visibility = vis;
+            LblActionDd.Visibility = vis;
+            LblActionDa.Visibility = vis;
+            LblActionFa.Visibility = vis;
+            LblActionFu.Visibility = vis;
 
             FilesToDeleteTBk.Visibility = vis;
             FilesDeletedTBk.Visibility = vis;
@@ -679,52 +675,24 @@ internal partial class FamilyPublishWindow : IDisposable
             {
                 case 'S':
                     {
-                        progressbarSource.Value = i.PercentNumber;
-                        textblockProgressSource.Text = $"{i.PercentNumber}%";
+                        ProgressbarSource.Value = i.PercentNumber;
+                        TextBlockProgressSource.Text = $"{i.PercentNumber}%";
                         break;
                     }
                 case 'D':
                     {
-                        progressbarDestination.Value = i.PercentNumber;
-                        textblockProgressDestination.Text = $"{i.PercentNumber}%";
+                        ProgressbarDestination.Value = i.PercentNumber;
+                        TextBlockProgressDestination.Text = $"{i.PercentNumber}%";
                         break;
                     }
                 case 'U':
                     {
-                        progressbarUpdate.Value = i.PercentNumber;
-                        textblockProgressUpdate.Text = $"{i.PercentNumber}%";
+                        ProgressbarUpdate.Value = i.PercentNumber;
+                        TextBlockProgressUpdate.Text = $"{i.PercentNumber}%";
                         DisplayStatistics(i.Results);
                         break;
                     }
             }
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    if (!(_cts is null))
-                    {
-                        _cts.Dispose(); // (managed objects)
-                    }
-                }
-                disposed = true;
-            }
-        }
-
-        
-        ~FamilyPublishWindow()
-        {
-             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-             Dispose(false);
-        }
-
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
     
 }

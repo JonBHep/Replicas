@@ -1,8 +1,6 @@
-﻿using System.Windows;
+﻿namespace Replicas;
 
-namespace Replicas;
-
-internal partial class WarningsWindow : Window
+internal partial class WarningsWindow
 {
     internal WarningsWindow()
     {
@@ -15,11 +13,11 @@ internal partial class WarningsWindow : Window
 
     public void SetComment(string txt)
     {
-        lblMessage.Text = txt;
+        LblMessage.Text = txt;
     }
 
     public void AddToList(string txt)
     {
-        lstExamples.Items.Add(txt);
+        LstExamples.Items.Add(txt);
     }
 }

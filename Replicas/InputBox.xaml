@@ -3,23 +3,22 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:Replicas"
         mc:Ignorable="d"
         Title="Input box" Height="100" Width="500" ShowInTaskbar="False" Topmost="True" WindowStartupLocation="CenterOwner" SizeToContent="Width" ResizeMode="NoResize" ContentRendered="Window_ContentRendered">
     <Grid Background="WhiteSmoke">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
+            <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
-        <TextBlock x:Name="textblockPrompt" VerticalAlignment="Center" Foreground="MidnightBlue" Margin="6,2,6,2">[prompt]</TextBlock>
-        <TextBox x:Name="textboxResponse" Grid.Column="1" VerticalAlignment="Center" Width="300" Margin="6,2,6,2" Padding="4 2" VerticalContentAlignment="Center" FontWeight="Medium"></TextBox>
+        <TextBlock x:Name="TextBlockPrompt" VerticalAlignment="Center" Foreground="MidnightBlue" Margin="6,2,6,2">[prompt]</TextBlock>
+        <TextBox x:Name="TextBoxResponse" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Width="300" Margin="6,2,6,2" Padding="4 2" VerticalContentAlignment="Center" FontWeight="Medium" />
         <DockPanel Grid.Row="1" Grid.Column="1" LastChildFill="False">
-            <Button x:Name="buttonOkay" DockPanel.Dock="Right" FontWeight="Bold" VerticalAlignment="Center" Margin="8,3,8,3" Padding="4 2" Click="buttonOkay_Click" Width="80">OK</Button>
-            <Button x:Name="buttonCancel" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="8,3,8,3" Padding="4 2" Click="buttonCancel_Click" Width="80">Cancel</Button>
+            <Button x:Name="ButtonOkay" DockPanel.Dock="Right" FontWeight="Bold" VerticalAlignment="Center" Margin="8,3,8,3" Padding="4 2" Click="buttonOkay_Click" Width="80">OK</Button>
+            <Button x:Name="ButtonCancel" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="8,3,8,3" Padding="4 2" Click="buttonCancel_Click" Width="80">Cancel</Button>
         </DockPanel>
     </Grid>
 </Window>

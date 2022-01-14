@@ -13,47 +13,31 @@ internal sealed class Kernel
 
         { get; } = new Kernel();
 
-        internal string CurrentTask;
+        internal string? CurrentTask;
 
-        private ReplicaJobs _jobs;
-        private DetectedDrives _locations;
-
+        private ReplicaJobs? _jobs;
+        private DetectedDrives? _locations;
+        private RememberedDrives? KnownLocations { get; set; }
+        
         internal void ShutDown()
         {
             JobProfiles.SaveProfile();
             KnownDrives.SaveProfile();
         }
 
-        internal ReplicaJobs JobProfiles
-        {
-            get
-            {
-                if (_jobs == null) { _jobs = new ReplicaJobs(); }
-                return _jobs;
-            }
-        }
+        internal ReplicaJobs JobProfiles => _jobs ??= new ReplicaJobs();
 
         internal RememberedDrives KnownDrives
         {
-            get
-            {
-                if (KnownLocations == null) { KnownLocations = new RememberedDrives(); }
-
-                return KnownLocations;
-            }
+            get { return KnownLocations ??= new RememberedDrives(); }
         }
 
         internal DetectedDrives DrivesCurrentlyFound
         {
-            get
-            {
-                if (_locations == null) { _locations = new DetectedDrives(); }
-
-                return _locations;
-            }
+            get { return _locations ??= new DetectedDrives(); }
         }
 
-        internal RememberedDrives KnownLocations { get; set; }
+        
 
         internal static string HowLongAgo(DateTime lastDate)
         {

@@ -8,33 +8,33 @@ using System.Windows.Shapes;
 
 namespace Replicas;
 
-public partial class JbhDataReportWindow : Window
+public partial class JbhDataReportWindow
 {
     public JbhDataReportWindow()
     {
         InitializeComponent();
     }
-    readonly List<string> infoList;
-        readonly List<string> businessList;
+    readonly List<string> _infoList=new List<string>();
+    private readonly List<string> _businessList=new List<string>();
         private readonly FontFamily _myFamily = new FontFamily("Verdana");
         private readonly double _mySize = 14;
-        private Thickness _myThick = new Thickness(8, 3, 8, 3);
+        private readonly Thickness _myThick = new Thickness(8, 3, 8, 3);
 
         public JbhDataReportWindow(List<string> infoDates, List<string> businessDates)
         {
             InitializeComponent();
-            infoList = infoDates;
-            businessList = businessDates;
-            tbkHeading.FontFamily = _myFamily;
-            tbkHeading.FontSize = _mySize;
-            tbkRubric.FontFamily = _myFamily;
-            tbkRubric.FontSize = _mySize;
+            _infoList = infoDates;
+            _businessList = businessDates;
+            TextBlockHeading.FontFamily = _myFamily;
+            TextBlockHeading.FontSize = _mySize;
+            TextBlockRubric.FontFamily = _myFamily;
+            TextBlockRubric.FontSize = _mySize;
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
 
-            foreach (string s in infoList)
+            foreach (string s in _infoList)
             {
                 string[] part = s.Split("^".ToCharArray());
 
@@ -77,7 +77,7 @@ public partial class JbhDataReportWindow : Window
                 InfoItemsControl.Items.Add(spnl);
             }
 
-            foreach (string s in businessList)
+            foreach (string s in _businessList)
             {
                 string[] part = s.Split("^".ToCharArray());
 

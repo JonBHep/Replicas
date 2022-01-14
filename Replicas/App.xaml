@@ -1,7 +1,6 @@
 ﻿<Application x:Class="Replicas.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:Replicas"
              Startup="Application_Startup" Exit="Application_Exit">
     <Application.Resources>
         <Style TargetType="{x:Type Button}" x:Key="styleButtonNorm">
@@ -28,7 +27,7 @@
                                         <!--was SaddleBrown-->
                                     </RadialGradientBrush>
                                 </Border.Background>
-                                <ContentPresenter x:Name="jonny" HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.FontWeight="Normal" TextElement.Foreground="Maroon" ></ContentPresenter>
+                                <ContentPresenter x:Name="jonny" HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.FontWeight="Normal" TextElement.Foreground="Maroon" />
                             </Border>
                         </Grid>
 
@@ -91,7 +90,7 @@
                                         <!--was SaddleBrown-->
                                     </RadialGradientBrush>
                                 </Border.Background>
-                                <ContentPresenter x:Name="jonnyBold" HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.FontWeight="Bold" TextElement.Foreground="Maroon" ></ContentPresenter>
+                                <ContentPresenter x:Name="jonnyBold" HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.FontWeight="Bold" TextElement.Foreground="Maroon" />
                             </Border>
                         </Grid>
 

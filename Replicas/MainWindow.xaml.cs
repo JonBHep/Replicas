@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
@@ -12,35 +13,37 @@ namespace Replicas
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
             public MainWindow()
         {
             InitializeComponent();
-            _tmrUpdate.Tick += new EventHandler(UpdateTimer_Tick);
+            _availableList = new ObservableCollection<JobListItem>();
+            _unavailableList = new ObservableCollection<JobListItem>();
+            _tmrUpdate.Tick += UpdateTimer_Tick;
         }
 
         private readonly System.Windows.Threading.DispatcherTimer _tmrUpdate = new System.Windows.Threading.DispatcherTimer();
 
         private class JobListItem
         {
-            public string Description { get; set; }
-            public string Priority { get; set; }
-            public string Lastrun { get; set; }
-            public string Whichwas { get; set; }
-            public string Urgency { get; set; }
-            public SolidColorBrush Urgencycolour { get; set; }
-            public SolidColorBrush Dangercolour { get; set; }
-            public SolidColorBrush OldestFlashColour { get; set; }
-            public string Tag { get; set; }
+            public string? Description { get; set; }
+            public string? Priority { get; set; }
+            public string? LastRun { get; set; }
+            public string? WhichWas { get; set; }
+            public string? Urgency { get; set; }
+            public SolidColorBrush? UrgencyColour { get; set; }
+            public SolidColorBrush? DangerColour { get; set; }
+            public SolidColorBrush? OldestFlashColour { get; set; }
+            public string? Tag { get; set; }
         }
 
-        private System.Collections.ObjectModel.ObservableCollection<JobListItem> _availableList;
-        private System.Collections.ObjectModel.ObservableCollection<JobListItem> _unavailableList;
+        private ObservableCollection<JobListItem> _availableList;
+        private ObservableCollection<JobListItem> _unavailableList;
         private enum ListMode { All, Info, Business, Other};
-        private ListMode lmode = ListMode.All;
+        private ListMode _lmode = ListMode.All;
 
-        private void UpdateTimer_Tick(object sender, EventArgs e)
+        private void UpdateTimer_Tick(object? sender, EventArgs e)
         {
             RefreshElapsedTimes();
         }
@@ -62,18 +65,18 @@ namespace Replicas
             double scrY = SystemParameters.PrimaryScreenHeight;
             double winX = scrX * .98;
             double winY = scrY * .94;
-            double Xm = (scrX - winX) / 2;
-            double Ym = (scrY - winY) / 4;
+            double xm = (scrX - winX) / 2;
+            double ym = (scrY - winY) / 4;
             Width = winX; Height = winY;
-            Left = Xm;
-            Top = Ym;
+            Left = xm;
+            Top = ym;
 
             Title = "Replicate";
             RunButtons(false);
-            btnDelete.IsEnabled = false;
-            btnAdd.IsEnabled = false;
-            btnRefresh.IsEnabled = false;
-            btnClose.IsEnabled = false;
+            BtnDelete.IsEnabled = false;
+            BtnAdd.IsEnabled = false;
+            BtnRefresh.IsEnabled = false;
+            BtnClose.IsEnabled = false;
         }
 
         private static bool JobOk(Tache t)
@@ -90,7 +93,7 @@ namespace Replicas
         {
             List<Tache> sortinglist = Kernel.Instance.JobProfiles.Jobs.Values.ToList();
             sortinglist.Sort();
-            switch (lmode)
+            switch (_lmode)
             {
                 case ListMode.Info:
                     {
@@ -132,13 +135,13 @@ namespace Replicas
             Kernel.Instance.JobProfiles.AllocateJbhBusinessFreshnessRanking();
 
             bool overdue= false;
-            if ((lmode == ListMode.Info) || (lmode == ListMode.Business))
+            if ((_lmode == ListMode.Info) || (_lmode == ListMode.Business))
             {
                 foreach (Tache t in appropriatelist)
                 {
                     if (t.Newest)
                     {
-                        if (t.Dueness() > 100)
+                        if (t.DuePercent() > 100)
                         {
                             overdue = true;
                             InstructionTextBlock.Text = "As the newest backup is not fresh, perform the backup marked 'Oldest'"; 
@@ -168,55 +171,40 @@ namespace Replicas
                 };
 
                 TimeSpan ago = DateTime.Now - t.LastDate;
-                TimeSpan NineMth = new TimeSpan(274, 0, 0, 0);
-                TimeSpan OneMth = new TimeSpan(30, 0, 0, 0);
+                TimeSpan nineMth = new TimeSpan(274, 0, 0, 0);
+                TimeSpan oneMth = new TimeSpan(30, 0, 0, 0);
 
                 if (t.LastDate < new DateTime(2010, 1, 1))
-                { jli.Lastrun = "Never"; }
-                else if (ago < OneMth)
+                { jli.LastRun = "Never"; }
+                else if (ago < oneMth)
                 {
-                    jli.Lastrun = t.LastDate.ToString("dd MMM - HH:mm", CultureInfo.CurrentCulture);
+                    jli.LastRun = t.LastDate.ToString("dd MMM - HH:mm", CultureInfo.CurrentCulture);
                 }
-                else if (ago < NineMth)
+                else if (ago < nineMth)
                 {
-                    jli.Lastrun = t.LastDate.ToString("dd MMM", CultureInfo.CurrentCulture);
+                    jli.LastRun = t.LastDate.ToString("dd MMM", CultureInfo.CurrentCulture);
                 }
                 else
-                { jli.Lastrun = t.LastDate.ToString("dd MMM yyyy", CultureInfo.CurrentCulture); }
+                { jli.LastRun = t.LastDate.ToString("dd MMM yyyy", CultureInfo.CurrentCulture); }
 
-                jli.Whichwas = t.PeriodSinceLastRun();
+                jli.WhichWas = t.PeriodSinceLastRun();
 
-                int u = t.Dueness();
+                int u = t.DuePercent();
                 jli.Urgency = (u < 0) ? string.Empty : $"{u}%";
-                //if ((lmode == ListMode.Info) || (lmode == ListMode.Business))
-                //{
-                //    if (t.Newest)
-                //    {
-                //        if (u > 100)
-                //        { InstructionTextBlock.Text = "As the newest backup is not fresh, perform the backup marked 'Oldest'"; InstructionTextBlock.Foreground = Brushes.Red; }
-                //        else
-                //        { InstructionTextBlock.Text = "The newest backup is acceptably recent"; InstructionTextBlock.Foreground = Brushes.Gray; }
-                //    }
-                //}
-                //else
-                //{
-                //    InstructionTextBlock.Text = string.Empty;
-                //}
-
-                jli.Urgencycolour = t.DuenessColorBrush();
-                jli.Dangercolour = t.Dangerous ? Brushes.Red : Brushes.SaddleBrown;
+                jli.UrgencyColour = t.DueColorBrush();
+                jli.DangerColour = t.Dangerous ? Brushes.Red : Brushes.SaddleBrown;
                 // which listview to add the job to
                 if (JobOk(t)) { _availableList.Add(jli); } else { _unavailableList.Add(jli); }
             }
 
-            btnEdit.IsEnabled = false;
-            btnDelete.IsEnabled = false;
-            lblJobTitle.Text = string.Empty;
-            lblJobSourcePath.Text = string.Empty;
-            lblJobSourceVolume.Text = string.Empty;
-            lblJobDestinationPath.Text = string.Empty;
-            lblJobDestinationVolume.Text = string.Empty;
-            lblJobFeatures.Text = string.Empty;
+            BtnEdit.IsEnabled = false;
+            BtnDelete.IsEnabled = false;
+            LblJobTitle.Text = string.Empty;
+            LblJobSourcePath.Text = string.Empty;
+            LblJobSourceVolume.Text = string.Empty;
+            LblJobDestinationPath.Text = string.Empty;
+            LblJobDestinationVolume.Text = string.Empty;
+            LblJobFeatures.Text = string.Empty;
         }
 
         private void InfoButton_Click(object sender, RoutedEventArgs e)
@@ -239,13 +227,14 @@ namespace Replicas
             // updates display in lists of time since last backup
             foreach (JobListItem jli in _availableList)
             {
-                string j = jli.Tag;
-                jli.Whichwas = Kernel.Instance.JobProfiles.Jobs[j].PeriodSinceLastRun();
+                if (jli.Tag is not { } quoi) continue;
+                jli.WhichWas = Kernel.Instance.JobProfiles.Jobs[quoi].PeriodSinceLastRun();
             }
+
             foreach (JobListItem jli in _unavailableList)
             {
-                string j = jli.Tag;
-                jli.Whichwas = Kernel.Instance.JobProfiles.Jobs[j].PeriodSinceLastRun();
+                if (jli.Tag is not { } quoi) continue;
+                jli.WhichWas = Kernel.Instance.JobProfiles.Jobs[quoi].PeriodSinceLastRun();
             }
         }
 
@@ -262,75 +251,90 @@ namespace Replicas
         {
             if (sender is ListView lvw)
             {
-                ListView otherListView = (lvw == lvwAvailable) ? lvwUnavailable: lvwAvailable;
+                ListView otherListView = (lvw == LvwAvailable) ? LvwUnavailable: LvwAvailable;
                 otherListView.SelectedIndex = -1;
 
                 if (lvw.SelectedItem == null)
                 { // no job is selected
                     Kernel.Instance.CurrentTask =string.Empty;
-                    lblJobTitle.Text = string.Empty;
-                    lblJobSourcePath.Text = string.Empty;
-                    lblJobSourceVolume.Text = string.Empty;
-                    lblJobDestinationPath.Text = string.Empty;
-                    lblJobDestinationVolume.Text = string.Empty;
-                    lblJobFeatures.Text = string.Empty;
+                    LblJobTitle.Text = string.Empty;
+                    LblJobSourcePath.Text = string.Empty;
+                    LblJobSourceVolume.Text = string.Empty;
+                    LblJobDestinationPath.Text = string.Empty;
+                    LblJobDestinationVolume.Text = string.Empty;
+                    LblJobFeatures.Text = string.Empty;
                     RunButtons(false);
-                    btnDelete.IsEnabled = false;
-                    btnEdit.IsEnabled = false;
+                    BtnDelete.IsEnabled = false;
+                    BtnEdit.IsEnabled = false;
                 }
                 else
                 { // a job is selected
                     if (lvw.SelectedItem is JobListItem job)
                     {
-                        if (job.Tag is string tog)
+                        if (job.Tag is {} tog)
                         {
                             Kernel.Instance.CurrentTask = tog;
 
-                            lblJobSourcePath.Foreground = Brushes.Purple;
-                            lblJobSourceVolume.Foreground = Brushes.Purple;
-                            lblJobDestinationPath.Foreground = Brushes.Purple;
-                            lblJobDestinationVolume.Foreground = Brushes.Purple;
+                            LblJobSourcePath.Foreground = Brushes.Purple;
+                            LblJobSourceVolume.Foreground = Brushes.Purple;
+                            LblJobDestinationPath.Foreground = Brushes.Purple;
+                            LblJobDestinationVolume.Foreground = Brushes.Purple;
 
                             Tache boulot = Kernel.Instance.JobProfiles.Jobs[Kernel.Instance.CurrentTask];
-                            lblJobTitle.Text = boulot.JobTitle;
-                            lblJobSourcePath.Text = boulot.SourcePath;
-                            lblJobDestinationPath.Text = boulot.DestinationPath;
-                            lblJobSourceVolume.Text = Kernel.Instance.KnownDrives.VolumeDescription(boulot.SourceVolume) + " (" + boulot.SourceVolume + ")";
+                            LblJobTitle.Text = boulot.JobTitle;
+                            LblJobSourcePath.Text = boulot.SourcePath;
+                            LblJobDestinationPath.Text = boulot.DestinationPath;
+                            LblJobSourceVolume.Text = Kernel.Instance.KnownDrives.VolumeDescription(boulot.SourceVolume) + " (" + boulot.SourceVolume + ")";
 
-                            long tot = boulot.DestinationSize(); ;
+                            long tot = boulot.DestinationSize(); 
                             long fre = boulot.DestinationFree();
 
                             if (tot < 0)
-                            { lblJobDestinationVolume.Text = Kernel.Instance.KnownDrives.VolumeDescription(boulot.DestinationVolume) + " (" + boulot.DestinationVolume + ")"; }
+                            {
+                                LblJobDestinationVolume.Text
+                                    = Kernel.Instance.KnownDrives.VolumeDescription(boulot.DestinationVolume) + " (" +
+                                      boulot.DestinationVolume + ")";
+                            }
                             else
-                            { lblJobDestinationVolume.Text = Kernel.Instance.KnownDrives.VolumeDescription(boulot.DestinationVolume) + " (" + boulot.DestinationVolume + ") " + KbReport(tot) + " total " + KbReport(fre) + " free (" + (Convert.ToInt32(100 * ((double)fre / tot))).ToString(CultureInfo.CurrentCulture) + "% free)"; }
+                            {
+                                LblJobDestinationVolume.Text
+                                    = Kernel.Instance.KnownDrives.VolumeDescription(boulot.DestinationVolume) + " (" +
+                                      boulot.DestinationVolume + ") " + KbReport(tot) + " total " + KbReport(fre) +
+                                      " free (" +
+                                      (Convert.ToInt32(100 * ((double) fre / tot)))
+                                      .ToString(CultureInfo.CurrentCulture) + "% free)";
+                            }
 
                             string features;
-                            if (boulot.IncludeHidden) { features = "Hidden files included, "; } else { features = "Hidden files excluded, "; }
-                            if (boulot.IsJbhInfoBackup) { features += "backs up Jbh.Info."; } else { features += "does not back up Jbh.Info."; }
-                            if (boulot.IsJbhBusinessBackup) { features += "backs up Jbh.Business."; } else { features += "does not back up Jbh.Business."; }
+                            features = boulot.IncludeHidden ? "Hidden files included, " : "Hidden files excluded, ";
 
-                            lblJobFeatures.Text = features;
+                            features += boulot.IsJbhInfoBackup ? "backs up Jbh.Info." : "does not back up Jbh.Info.";
+
+                            features += boulot.IsJbhBusinessBackup
+                                ? "backs up Jbh.Business."
+                                : "does not back up Jbh.Business.";
+
+                            LblJobFeatures.Text = features;
 
                             RunButtons(true);
-                            btnEdit.IsEnabled = true;
+                            BtnEdit.IsEnabled = true;
 
                             if (string.IsNullOrWhiteSpace(boulot.SourceFoundDrivePath()))
                             { // source not accesible
-                                lblJobSourcePath.Foreground = Brushes.Red;
+                                LblJobSourcePath.Foreground = Brushes.Red;
                                 RunButtons(false);
                             }
 
                             if (string.IsNullOrWhiteSpace(boulot.DestinationFoundDrivePath()))
                             { // destination not accesible
-                                lblJobDestinationPath.Foreground = Brushes.Red;
+                                LblJobDestinationPath.Foreground = Brushes.Red;
                                 RunButtons(false);
                             }
 
                             // signal if drive not found (as well as full path)
-                            if (Kernel.Instance.DrivesCurrentlyFound.DriveLetter(boulot.SourceVolume) == null) { lblJobSourceVolume.Foreground = Brushes.Red; }
-                            if (Kernel.Instance.DrivesCurrentlyFound.DriveLetter(boulot.DestinationVolume) == null) { lblJobDestinationVolume.Foreground = Brushes.Red; }
-                            btnDelete.IsEnabled = true;
+                            if (Kernel.Instance.DrivesCurrentlyFound.DriveLetter(boulot.SourceVolume) == null) { LblJobSourceVolume.Foreground = Brushes.Red; }
+                            if (Kernel.Instance.DrivesCurrentlyFound.DriveLetter(boulot.DestinationVolume) == null) { LblJobDestinationVolume.Foreground = Brushes.Red; }
+                            BtnDelete.IsEnabled = true;
                         }
                     }
                 }
@@ -340,19 +344,35 @@ namespace Replicas
         private void SelectTargetItem(string target)
         {
             int itm = -1;
-            ListView lvw = lvwAvailable;
+            ListView lvw = LvwAvailable;
             for (int x = 0; x < lvw.Items.Count; x++)
             {
-                JobListItem jli = lvw.Items[x] as JobListItem;
-                if (jli.Tag == target) { itm = x; }
+                if (lvw.Items[x] is JobListItem jobLi)
+                {
+                    if (jobLi.Tag is { } aString)
+                    {
+                        if (aString == target)
+                        {
+                            itm = x;
+                        }
+                    }    
+                }
             }
             if (itm == -1)
             {
-                lvw = lvwUnavailable;
+                lvw = LvwUnavailable;
                 for (int x = 0; x < lvw.Items.Count; x++)
                 {
-                    JobListItem jli = lvw.Items[x] as JobListItem;
-                    if (jli.Tag == target) { itm = x; }
+                    if (lvw.Items[x] is JobListItem jobLi)
+                    {
+                        if (jobLi.Tag is { } aString)
+                        {
+                            if (aString == target)
+                            {
+                                itm = x;
+                            }
+                        }    
+                    }
                 }
             }
             if (itm >= 0)
@@ -462,14 +482,14 @@ namespace Replicas
             Kernel.Instance.JobProfiles
                 .SaveProfile(); // To ensure this backup event is recorded before the user has the opportunity to click the Refresh button
             RunButtons(false);
-            btnEdit.IsEnabled = false;
+            BtnEdit.IsEnabled = false;
             RefreshLists();
             UpdateFreshness();
         }
 
         private void RunButtons(bool flick)
         {
-            btnRun.IsEnabled = btnRun2.IsEnabled = flick;
+            BtnRun.IsEnabled = BtnRun2.IsEnabled = flick;
         }
         private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -480,54 +500,54 @@ namespace Replicas
         {
             if (string.IsNullOrWhiteSpace(Jbh.AppManager.DataPath)) { MessageBox.Show("Path to data is not found.\n\nKeepers will close.", "Databank is not accessible", MessageBoxButton.OK, MessageBoxImage.Error); Close(); }
 
-            _availableList = new System.Collections.ObjectModel.ObservableCollection<JobListItem>();
-            _unavailableList = new System.Collections.ObjectModel.ObservableCollection<JobListItem>();
+            _availableList = new ObservableCollection<JobListItem>();
+            _unavailableList = new ObservableCollection<JobListItem>();
             RefreshLists();
-            btnRefresh.IsEnabled = true;
-            lblJobTitle.Text = string.Empty;
-            lblJobSourcePath.Text = string.Empty;
-            lblJobSourceVolume.Text = string.Empty;
-            lblJobDestinationPath.Text = string.Empty;
-            lblJobFeatures.Text = string.Empty;
-            btnAdd.IsEnabled = true;
-            btnClose.IsEnabled = true;
+            BtnRefresh.IsEnabled = true;
+            LblJobTitle.Text = string.Empty;
+            LblJobSourcePath.Text = string.Empty;
+            LblJobSourceVolume.Text = string.Empty;
+            LblJobDestinationPath.Text = string.Empty;
+            LblJobFeatures.Text = string.Empty;
+            BtnAdd.IsEnabled = true;
+            BtnClose.IsEnabled = true;
             _tmrUpdate.Interval = new TimeSpan(days: 0, hours: 0, minutes: 1, seconds: 0, milliseconds: 0);
             _tmrUpdate.IsEnabled = true;
 
-            lvwAvailable.ItemsSource = _availableList;
-            lvwUnavailable.ItemsSource = _unavailableList;
+            LvwAvailable.ItemsSource = _availableList;
+            LvwUnavailable.ItemsSource = _unavailableList;
             UpdateFreshness();
         }
 
         private void UpdateFreshness()
         {
-            List<string> InfoJobList = Kernel.Instance.JobProfiles.JbhInfoDates();
-            List<string> BusiJobList = Kernel.Instance.JobProfiles.JbhBusinessDates();
-            string qi = InfoJobList.First();
-            string zi = InfoJobList.Last();
-            string qb = BusiJobList.First();
-            string zb = BusiJobList.Last();
+            List<string> infoJobList = Kernel.Instance.JobProfiles.JbhInfoDates();
+            List<string> busiJobList = Kernel.Instance.JobProfiles.JbhBusinessDates();
+            string qi = infoJobList.First();
+            string zi = infoJobList.Last();
+            string qb = busiJobList.First();
+            string zb = busiJobList.Last();
             string[] pi = qi.Split("^".ToCharArray());
             string[] pb = qb.Split("^".ToCharArray());
             string[] vi = zi.Split("^".ToCharArray());
             string[] vb = zb.Split("^".ToCharArray());
             InfoBlocB.Text = vi[1];
             InfoBlocA.Text = pi[2];
-            BusiBlocB.Text = vb[1];
-            BusiBlocA.Text = pb[2];
+            BusinessBlocB.Text = vb[1];
+            BusinessBlocA.Text = pb[2];
 
             List<Tuple<int, int>> jobcounts = Kernel.Instance.JobProfiles.JobCounts();
-            BusiBlocC.Text = $"{jobcounts[0].Item1 + jobcounts[0].Item2}";
-            BusiBlocD.Text = $"{jobcounts[0].Item1}";
-            BusiBlocE.Text = $"{jobcounts[0].Item2}";
+            BusinessBlocC.Text = $"{jobcounts[0].Item1 + jobcounts[0].Item2}";
+            BusinessBlocD.Text = $"{jobcounts[0].Item1}";
+            BusinessBlocE.Text = $"{jobcounts[0].Item2}";
 
             InfoBlocC.Text = $"{jobcounts[1].Item1 + jobcounts[1].Item2}";
             InfoBlocD.Text = $"{jobcounts[1].Item1}";
             InfoBlocE.Text = $"{jobcounts[1].Item2}";
 
-            OthrBlocC.Text = $"{jobcounts[2].Item1 + jobcounts[2].Item2}";
-            OthrBlocD.Text = $"{jobcounts[2].Item1}";
-            OthrBlocE.Text = $"{jobcounts[2].Item2}";
+            OtherBlocC.Text = $"{jobcounts[2].Item1 + jobcounts[2].Item2}";
+            OtherBlocD.Text = $"{jobcounts[2].Item1}";
+            OtherBlocE.Text = $"{jobcounts[2].Item2}";
         }
 
         private void DatabankButton_Click(object sender, RoutedEventArgs e)
@@ -541,35 +561,32 @@ namespace Replicas
         
         private void FamilyMatButton_Click(object sender, RoutedEventArgs e)
         {
-            using (FamilyPublishWindow w = new FamilyPublishWindow(false) { Owner = this })
-            {
+            FamilyPublishWindow w = new FamilyPublishWindow(false) {Owner = this};
                 w.ShowDialog();
-            }
         }
 
         private void FamilyPatButton_Click(object sender, RoutedEventArgs e)
         {
-            using (FamilyPublishWindow w = new FamilyPublishWindow(true) { Owner = this })
-            {
+            FamilyPublishWindow w = new FamilyPublishWindow(true) {Owner = this};
+            
                 w.ShowDialog();
-            }
         }
 
         private void ListInfoButton_Click(object sender, RoutedEventArgs e)
         {
-            lmode = ListMode.Info;
+            _lmode = ListMode.Info;
             SelectionTextBlock.Text = "Jbh.Info backup jobs";
             RefreshLists();
         }
         private void ListBusinesButton_Click(object sender, RoutedEventArgs e)
         {
-            lmode = ListMode.Business;
+            _lmode = ListMode.Business;
             SelectionTextBlock.Text = "Jbh.Business backup jobs";
             RefreshLists();
         }
         private void ListOtherButton_Click(object sender, RoutedEventArgs e)
         {
-            lmode = ListMode.Other;
+            _lmode = ListMode.Other;
             SelectionTextBlock.Text = "Miscellaneous jobs";
             RefreshLists();
         }

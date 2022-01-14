@@ -4,11 +4,11 @@ namespace Replicas;
 
 internal class Tache : IComparable<Tache>
 {
-    public string JobTitle { get; set; }
-    public string SourcePath { get; set; }
-    public string DestinationPath { get; set; }
-    public string SourceVolume { get; set; }
-    public string DestinationVolume { get; set; }
+    public string? JobTitle { get; set; }
+    public string? SourcePath { get; set; }
+    public string? DestinationPath { get; set; }
+    public string? SourceVolume { get; set; }
+    public string? DestinationVolume { get; set; }
     public bool IncludeHidden { get; set; }
 
     public bool
@@ -21,10 +21,7 @@ internal class Tache : IComparable<Tache>
     public bool IsJbhInfoBackup { get; set; }
     public bool IsJbhBusinessBackup { get; set; }
 
-    public bool IsJbhSpecialBackup
-    {
-        get { return IsJbhBusinessBackup || IsJbhInfoBackup; }
-    }
+    public bool IsJbhSpecialBackup => IsJbhBusinessBackup || IsJbhInfoBackup;
 
     public DateTime LastDate { get; set; }
 
@@ -37,11 +34,11 @@ internal class Tache : IComparable<Tache>
     //public int DynamicPriority { get; set; } // For Jbh.Info or Jbh.Business backups this indicates the order in which the rotating backups should be made
     public bool Oldest { get; set; }
     public bool Newest { get; set; }
-    public string Key { get; set; }
+    public string? Key { get; set; }
 
-    public int CompareTo(Tache other)
+    public int CompareTo(Tache? other)
     {
-        return string.Compare(JobTitle, other.JobTitle, StringComparison.CurrentCultureIgnoreCase);
+        return other is { } ? string.Compare(JobTitle, other.JobTitle, StringComparison.CurrentCultureIgnoreCase) : 0;
     }
 
     internal string PeriodSinceLastRun()
@@ -49,7 +46,7 @@ internal class Tache : IComparable<Tache>
         return Kernel.HowLongAgo(LastDate);
     }
 
-    internal int Dueness()
+    internal int DuePercent()
     {
         if (!IsJbhSpecialBackup)
         {
@@ -61,10 +58,10 @@ internal class Tache : IComparable<Tache>
             return -2;
         } // only show a freshness colour for the newest backup
 
-        return DuenessPercentage(LastDate);
+        return DuePercentage(LastDate);
     }
 
-    private static int DuenessPercentage(DateTime lastDate)
+    private static int DuePercentage(DateTime lastDate)
     {
         if (lastDate < new DateTime(year: 2010, month: 1, day: 1)) return 999;
         TimeSpan s = DateTime.Now - lastDate;
@@ -72,9 +69,9 @@ internal class Tache : IComparable<Tache>
         return Convert.ToInt32(100 * (s.TotalMinutes / i.TotalMinutes));
     }
 
-    internal System.Windows.Media.SolidColorBrush DuenessColorBrush()
+    internal System.Windows.Media.SolidColorBrush DueColorBrush()
     {
-        int percent = Dueness();
+        int percent = DuePercent();
         if (percent == -1)
         {
             return System.Windows.Media.Brushes.CornflowerBlue;
@@ -87,8 +84,8 @@ internal class Tache : IComparable<Tache>
 
         System.Windows.Media.Color colourOne = System.Windows.Media.Colors.Green;
         System.Windows.Media.Color colourTwo = System.Windows.Media.Colors.Red;
-        int startindex = 75;
-        int endindex = 125;
+        const int startIndex = 75;
+        int endIndex = 125;
 
         System.Windows.Media.SolidColorBrush scb;
 
@@ -108,8 +105,8 @@ internal class Tache : IComparable<Tache>
             byte rT = colourTwo.R;
             byte gT = colourTwo.G;
             byte bT = colourTwo.B;
-            float steps = endindex - startindex;
-            percent -= startindex;
+            float steps = endIndex - startIndex;
+            percent -= startIndex;
             byte rM = (byte) (rO + (percent * ((byte) ((rT - rO) / steps))));
             byte gM = (byte) (gO + (percent * ((byte) ((gT - gO) / steps))));
             byte bM = (byte) (bO + (percent * ((byte) ((bT - bO) / steps))));
@@ -122,59 +119,49 @@ internal class Tache : IComparable<Tache>
 
     internal string SourceFoundDrivePath()
     {
-        char? l;
-        string p;
-        string v;
-        string pathOnFoundDrive;
         // substitute current drive letter according to volume label
-        p = SourcePath;
-        v = SourceVolume;
+        var p = SourcePath;
+        var v = SourceVolume;
+        if ((p is not {})||(v is not {}))
+        {
+            return string.Empty;
+        }
         DetectedDrives loci = new DetectedDrives();
-        l = loci.DriveLetter(v, p);
-        if (l == null)
+        var l = loci.DriveLetter(v, p);
+        if ((l is not {})||(SourcePath is not {}))
         {
             return string.Empty;
         }
         else
         {
-            pathOnFoundDrive = l + SourcePath.Substring(1);
-            if (System.IO.Directory.Exists(pathOnFoundDrive))
-            {
-                return pathOnFoundDrive;
-            }
-            else
-            {
-                return string.Empty;
-            }
+            var pathOnFoundDrive = l + SourcePath[1..];
+            return System.IO.Directory.Exists(pathOnFoundDrive) ? pathOnFoundDrive : string.Empty;
         }
     }
 
     internal string DestinationFoundDrivePath()
     {
-        char? l;
-        string p;
-        string v;
-        string pathOnFoundDrive;
         // substitute current drive letter according to volume label
-        p = DestinationPath;
-        v = DestinationVolume;
+        var p = DestinationPath;
+        var v = DestinationVolume;
+        if ((p is not { }) || (v is not { }))
+        {
+            return string.Empty;
+        }
         DetectedDrives loci = new DetectedDrives();
-        l = loci.DriveLetter(v, p);
+        var l = loci.DriveLetter(v, p);
         if (l == null)
         {
             return string.Empty;
         }
         else
         {
-            pathOnFoundDrive = l + DestinationPath.Substring(1);
-            if (System.IO.Directory.Exists(pathOnFoundDrive))
-            {
-                return pathOnFoundDrive;
-            }
-            else
+            if (DestinationPath is not { })
             {
                 return string.Empty;
             }
+            var pathOnFoundDrive = l + DestinationPath.Substring(1);
+            return System.IO.Directory.Exists(pathOnFoundDrive) ? pathOnFoundDrive : string.Empty;
         }
     }
 

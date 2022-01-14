@@ -3,31 +3,30 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:Replicas"
         mc:Ignorable="d"
         Title="Disk drives" Height="850" Width="1200" ShowInTaskbar="False" ResizeMode="NoResize" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen"
         x:ClassModifier="internal">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"></RowDefinition>
-            <RowDefinition Height="Auto" MinHeight="10"></RowDefinition>
-            <RowDefinition Height="2*"></RowDefinition>
-            <RowDefinition Height="30"></RowDefinition>
-            <RowDefinition Height="Auto" MinHeight="10"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="Auto" MinHeight="10" />
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="Auto" MinHeight="10" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <DockPanel LastChildFill="False">
             <Button Style="{StaticResource styleButtonNorm}" DockPanel.Dock="Right" VerticalAlignment="Top" Margin="0,3,6,0" Padding="20 3" Width="80" Click="CloseButton_Click">Close</Button>
             <TextBlock FontWeight="Medium" Margin="4" ><Run Text="Recognised drives, whether or not currently found on the system"/></TextBlock>
             <TextBlock Margin="4" Foreground="RoyalBlue"><Run Text="Right-click an item to edit or delete the drive description"/></TextBlock>
             <CheckBox x:Name="ShowJobsCheckBox" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="8 0 0 0" Checked="ShowJobsCheckBox_Checked" Unchecked="ShowJobsCheckBox_Checked" IsThreeState="False">
-                <TextBlock Text="Show a list of the jobs which reference each drive" Foreground="Crimson" FontWeight="Medium"></TextBlock>
+                <TextBlock Text="Show a list of the jobs which reference each drive" Foreground="Crimson" FontWeight="Medium" />
             </CheckBox>
         </DockPanel>
-        <StackPanel x:Name="ListOneHeadingsStackPanel" Grid.Row="1" Orientation="Horizontal"></StackPanel>
+        <StackPanel x:Name="ListOneHeadingsStackPanel" Grid.Row="1" Orientation="Horizontal" />
         <ListBox x:Name="RecognisedDrivesListBox" Grid.Row="2" Margin="4 0 4 0" Background="GhostWhite"/>
         <TextBlock Grid.Row="3" FontWeight="Medium" Margin="4" ><Run Text="Drives found on the system but not remembered or linked to a backup job"/></TextBlock>
-        <StackPanel x:Name="ListTwoHeadingsStackPanel" Grid.Row="4" Orientation="Horizontal"></StackPanel>
+        <StackPanel x:Name="ListTwoHeadingsStackPanel" Grid.Row="4" Orientation="Horizontal" />
         <ListBox x:Name="UnrecognisedDrivesListBox" Grid.Row="5" Margin="4 0 4 0" Background="GhostWhite"/>
     </Grid>
 </Window>
