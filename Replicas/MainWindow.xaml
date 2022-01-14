@@ -121,21 +121,20 @@
                         <GridView>
                             <GridViewColumn Header="Jobs" CellTemplate="{StaticResource TitleTemplate}"/>
                             <GridViewColumn Header="Priority" Width="74" CellTemplate="{StaticResource PriorityTemplate}"/>
+                            <GridViewColumn Header="Age" CellTemplate="{StaticResource AgeTemplate}"/>
                             <GridViewColumn Header="Last run" DisplayMemberBinding="{Binding LastRun}"/>
                             <GridViewColumn Header="Which was" DisplayMemberBinding="{Binding WhichWas}"/>
-                            <GridViewColumn Header="Age" CellTemplate="{StaticResource AgeTemplate}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
-                <ListView x:Name="LvwUnavailable" Grid.Row="2" Grid.Column="1" Margin="2 0 0 0" Background="LightGray" SelectionChanged="ListView_SelectionChanged" MouseDoubleClick="ListView_MouseDoubleClick" SelectionMode="Single">
+                <ListView x:Name="LvwUnavailable" Grid.Row="2" Grid.Column="1" Margin="2 0 0 0" SelectionChanged="ListView_SelectionChanged" MouseDoubleClick="ListView_MouseDoubleClick" SelectionMode="Single">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="Jobs" CellTemplate="{StaticResource TitleTemplate}"/>
-                            <!-- <GridViewColumn Header="Interval" Width="120" DisplayMemberBinding="{Binding Interval}"/> -->
                             <GridViewColumn Header="Priority" Width="74" CellTemplate="{StaticResource PriorityTemplate}"/>
+                            <GridViewColumn Header="Age" CellTemplate="{StaticResource AgeTemplate}"/>
                             <GridViewColumn Header="Last run" DisplayMemberBinding="{Binding LastRun}"/>
                             <GridViewColumn Header="Which was" DisplayMemberBinding="{Binding WhichWas}"/>
-                            <GridViewColumn Header="Age" CellTemplate="{StaticResource AgeTemplate}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>

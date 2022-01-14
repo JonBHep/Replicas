@@ -145,9 +145,9 @@ internal class Tache : IComparable<Tache>
             bool testedOk = true;
             try
             {
-                string[] ff = Directory.GetFiles(pathOnFoundDrive);
+                _ = Directory.GetFiles(pathOnFoundDrive);
             }
-            catch (Exception e)
+            catch (Exception )
             {
                 testedOk = false;
             }
@@ -185,9 +185,9 @@ internal class Tache : IComparable<Tache>
             bool testedOk = true;
             try
             {
-                string[] ff = Directory.GetFiles(pathOnFoundDrive);
+                _ = Directory.GetFiles(pathOnFoundDrive);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 testedOk = false;
             }
@@ -203,7 +203,7 @@ internal class Tache : IComparable<Tache>
             return -1;
         }
 
-        System.IO.DriveInfo di = new System.IO.DriveInfo(fddrv);
+        DriveInfo di = new DriveInfo(fddrv);
         return di.AvailableFreeSpace;
     }
 
@@ -215,7 +215,7 @@ internal class Tache : IComparable<Tache>
             return -1;
         }
 
-        System.IO.DriveInfo di = new System.IO.DriveInfo(fddrv);
+        DriveInfo di = new DriveInfo(fddrv);
         return di.TotalSize;
     }
 
@@ -227,7 +227,7 @@ internal class Tache : IComparable<Tache>
             return -1;
         }
 
-        System.IO.DriveInfo di = new System.IO.DriveInfo(fddrv);
+        DriveInfo di = new DriveInfo(fddrv);
         return di.AvailableFreeSpace;
     }
 
@@ -239,7 +239,7 @@ internal class Tache : IComparable<Tache>
             return -1;
         }
 
-        System.IO.DriveInfo di = new System.IO.DriveInfo(fddrv);
+        DriveInfo di = new DriveInfo(fddrv);
         return di.TotalSize;
     }
 
