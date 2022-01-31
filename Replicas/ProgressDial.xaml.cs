@@ -10,7 +10,11 @@ public partial class ProgressDial
     public ProgressDial()
         {
             InitializeComponent();
+            _polyDialFace.Fill = Brushes.Cornsilk;
             DrawPolygon();
+            _polyProgress.Stroke = Brushes.Tan;
+            _polyProgress.StrokeThickness = 0.5;
+            _polyProgress.Fill = Brushes.Tan;
         }
 
         private double _radius = 24;
@@ -37,7 +41,7 @@ public partial class ProgressDial
             }
             _polyDialFace.Stroke = Brushes.Tan;
             _polyDialFace.StrokeThickness = 0.5;
-            _polyDialFace.Fill = Brushes.Cornsilk;
+            
             CanvasDial.Children.Add(_polyDialFace);
 
             DrawSecondPolygon(0);
@@ -53,9 +57,7 @@ public partial class ProgressDial
             {
                 _polyProgress.Points.Add(_percentPoints[x]);
             }
-            _polyProgress.Stroke = Brushes.Tan;
-            _polyProgress.StrokeThickness = 0.5;
-            _polyProgress.Fill = Brushes.Tan;
+            
         }
 
         private void UpdateProgressDisplay(int percent)

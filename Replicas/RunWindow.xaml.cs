@@ -24,65 +24,73 @@ internal partial class RunWindow
     private Progress<ProgressInfo>? _progressChaser;
     private CancellationTokenSource? _cts;
 
-    internal RunWindow()
+    internal RunWindow(Tache quoiFaire)
     {
         InitializeComponent();
-        _boulot = Kernel.Instance.JobProfiles.Jobs[Kernel.Instance.CurrentTask];
+        _boulot = quoiFaire;
+        BytesDial.Foreground = ProgressbarSource.Foreground;
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // hide action count labels
 
-            stackpanelafter.Visibility = Visibility.Hidden;
+            Stackpanelafter.Visibility = Visibility.Hidden;
             DisplayMessage("Ready to analyse", waitingInput: true);
-            textblockProgressSource.Text = string.Empty;
-            lblFileBalance.Text = "";
-            lblFolderBalance.Text = "";
-            buttonUpdate.Visibility = Visibility.Collapsed;
-            buttonDetail.Visibility = Visibility.Collapsed;
+            TextBlockProgressSource.Text = string.Empty;
+            LblFileBalance.Text = "";
+            LblFolderBalance.Text = "";
+            ButtonUpdate.Visibility = Visibility.Collapsed;
+            ButtonDetail.Visibility = Visibility.Collapsed;
             
-            txtTitle.Text = $"Replicas - {_boulot.JobTitle}";
+            TxtTitle.Text = $"Replicas - {_boulot.JobTitle}";
 
-            _includeHidden =_boulot.IncludeHidden;
-            lblPathS.Text =_boulot.SourceFoundDrivePath();
-            lblPathD.Text =_boulot.DestinationFoundDrivePath();
-            string v =_boulot.SourceVolume;
-            lblDriveS.Text = Kernel.Instance.KnownDrives.VolumeDescription(v) + " (" + v + ")";
-            v =_boulot.DestinationVolume;
-            lblDriveD.Text = Kernel.Instance.KnownDrives.VolumeDescription(v) + " (" + v + ")";
+            
+                _includeHidden = _boulot.IncludeHidden;
+                LblPathS.Text = _boulot.SourceFoundDrivePath();
+                LblPathD.Text = _boulot.DestinationFoundDrivePath();
+                if (_boulot.SourceVolume != null)
+                {
+                    string v = _boulot.SourceVolume;
+                    LblDriveS.Text = Kernel.Instance.KnownDrives.VolumeDescription(v) + " (" + v + ")";
+                    if (_boulot.DestinationVolume != null) v = _boulot.DestinationVolume;
+                    LblDriveD.Text = Kernel.Instance.KnownDrives.VolumeDescription(v) + " (" + v + ")";
+                }
 
-            lblSourceFilesL.Visibility = Visibility.Hidden;
-            lblSourceFiles.Visibility = Visibility.Hidden;
-            lblDestinFilesL.Visibility = Visibility.Hidden;
-            lblDestinFiles.Visibility = Visibility.Hidden;
-            lblSourceFoldersL.Visibility = Visibility.Hidden;
-            lblSourceFolders.Visibility = Visibility.Hidden;
-            lblDestinFoldersL.Visibility = Visibility.Hidden;
-            lblDestinFolders.Visibility = Visibility.Hidden;
-            lblFileBalance.Visibility = Visibility.Hidden;
-            lblFolderBalance.Visibility = Visibility.Hidden;
+                LblSourceFilesL.Visibility = Visibility.Hidden;
+                LblSourceFiles.Visibility = Visibility.Hidden;
+                LblDestinFilesL.Visibility = Visibility.Hidden;
+                LblDestinFiles.Visibility = Visibility.Hidden;
+                LblSourceFoldersL.Visibility = Visibility.Hidden;
+                LblSourceFolders.Visibility = Visibility.Hidden;
+                LblDestinFoldersL.Visibility = Visibility.Hidden;
+                LblDestinFolders.Visibility = Visibility.Hidden;
+                LblFileBalance.Visibility = Visibility.Hidden;
+                LblFolderBalance.Visibility = Visibility.Hidden;
 
-            lblLastPerformed.Text =_boulot.PeriodSinceLastRun();
-            lblHidden.Text = _includeHidden ? "Included" : "Not included";
+                LblLastPerformed.Text = _boulot.PeriodSinceLastRun();
+                LblHidden.Text = _includeHidden ? "Included" : "Not included";
 
-            // report source and destination usage before backup
-            long tot = _boulot.SourceSize();
-            long fre =_boulot.SourceFree();
-            int percentFree = Convert.ToInt32(100 * ((double)fre / tot));
-            lblSourceScope.Text = $"{Kernel.SizeReport(tot)} total {Kernel.SizeReport(fre)} free ({percentFree}% free)";
-            prgSource.Value = 100 - percentFree;
+                // report source and destination usage before backup
+                long tot = _boulot.SourceSize();
+                long fre = _boulot.SourceFree();
+                int percentFree = Convert.ToInt32(100 * ((double) fre / tot));
+                LblSourceScope.Text
+                    = $"{Kernel.SizeReport(tot)} total {Kernel.SizeReport(fre)} free ({percentFree}% free)";
+                PrgSource.Value = 100 - percentFree;
 
-            tot =_boulot.DestinationSize();
-            fre =_boulot.DestinationFree();
-            _freeSpaceBefore = fre;
-            percentFree = Convert.ToInt32(100 * ((double)fre / tot));
-            lblDestinationAfterScope.Text = lblDestinationBeforeScope.Text = $"{Kernel.SizeReport(tot)} total {Kernel.SizeReport(fre)} free ({percentFree}% free)";
-            prgDestinationAfter.Value = prgDestinationBefore.Value = 100 - percentFree;
+                tot = _boulot.DestinationSize();
+                fre = _boulot.DestinationFree();
+                _freeSpaceBefore = fre;
+                percentFree = Convert.ToInt32(100 * ((double) fre / tot));
+                LblDestinationAfterScope.Text = LblDestinationBeforeScope.Text
+                    = $"{Kernel.SizeReport(tot)} total {Kernel.SizeReport(fre)} free ({percentFree}% free)";
+                PrgDestinationAfter.Value = PrgDestinationBefore.Value = 100 - percentFree;
+            
 
-            buttonClose.Visibility = Visibility.Visible;
-            buttonClose.Content = "Cancel";
-            buttonCancelUpdate.Visibility = Visibility.Collapsed;
+            ButtonClose.Visibility = Visibility.Visible;
+            ButtonClose.Content = "Cancel";
+            ButtonCancelUpdate.Visibility = Visibility.Collapsed;
 
             SwitchImplementationDisplay(false);
             SwitchImplementationErrorsDisplay(false); 
@@ -92,7 +100,7 @@ internal partial class RunWindow
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            if (buttonUpdate.IsVisible)
+            if (ButtonUpdate.IsVisible)
             {
                 if (MessageBox.Show("You have not performed the update\n\nClose anyway?", "Replicas", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) { Close(); }
             }
@@ -102,7 +110,7 @@ internal partial class RunWindow
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (buttonClose.Visibility == Visibility.Visible) return;
+            if (ButtonClose.Visibility == Visibility.Visible) return;
             MessageBox.Show("JBH: I am not allowing window closure because the Close button is not visible", "Replicas", MessageBoxButton.OK, MessageBoxImage.Warning);
             e.Cancel = true;
         }
@@ -353,14 +361,15 @@ internal partial class RunWindow
 
         private async void LaunchUpdate()
         {
-            buttonUpdate.Visibility = Visibility.Collapsed;
-            buttonDetail.Visibility = Visibility.Collapsed;
-            buttonCancelUpdate.Visibility = Visibility.Visible;
+            ButtonUpdate.Visibility = Visibility.Collapsed;
+            ButtonDetail.Visibility = Visibility.Collapsed;
+            ButtonCancelUpdate.Visibility = Visibility.Visible;
             DisplayMessage("Updating", waitingInput: false);
-            buttonClose.Visibility = Visibility.Collapsed;
+            ButtonClose.Visibility = Visibility.Collapsed;
             Cursor = Cursors.Wait;
-            string sd = Kernel.Instance.JobProfiles.Jobs[Kernel.Instance.CurrentTask].SourceFoundDrivePath();
-            string dd = Kernel.Instance.JobProfiles.Jobs[Kernel.Instance.CurrentTask].DestinationFoundDrivePath();
+            
+            string sd =_boulot.SourceFoundDrivePath();
+            string dd =_boulot.DestinationFoundDrivePath();
 
             // NB This implementation polls CancellationToken.IsCancellationRequested (bool) rather than throwing an error
             // Compare the example in FamilyTree - detectIntramarriages which uses the error method (which Cleary favours)
@@ -384,12 +393,12 @@ internal partial class RunWindow
         {
             // can be triggered by 'Analyse' button or 'Analyse and Update' button 
             Button? source = sender as Button;
-            buttonAnalyse.Visibility = Visibility.Collapsed;
-            buttonAnalysePlus.Visibility = Visibility.Collapsed;
-            _runOn = source != buttonAnalyse;
+            ButtonAnalyse.Visibility = Visibility.Collapsed;
+            ButtonAnalysePlus.Visibility = Visibility.Collapsed;
+            _runOn = source != ButtonAnalyse;
 
             Cursor = Cursors.Wait;
-            buttonClose.Visibility = Visibility.Collapsed;
+            ButtonClose.Visibility = Visibility.Collapsed;
             DisplayMessage("Analysing", waitingInput: false);
             if (_progressChaser != null)
             {
@@ -414,24 +423,27 @@ internal partial class RunWindow
             {
                 case 'S':
                     {
-                        progressbarSource.Value = i.PercentNumber;
-                        textblockProgressSource.Text =$"{i.PercentNumber}%";
+                        ProgressbarSource.Value = i.PercentNumber;
+                        TextBlockProgressSource.Text =$"{i.PercentNumber}%";
                         break;
                     }
                 case 'D':
                     {
-                        progressbarDestination.Value =i.PercentNumber;
-                        textblockProgressDestination.Text =$"{i.PercentNumber}%";
+                        ProgressbarDestination.Value =i.PercentNumber;
+                        TextBlockProgressDestination.Text =$"{i.PercentNumber}%";
                         break;
                     }
                 case 'U':
                     {
-                        progressbarUpdateSize.Value =i.PercentSize;
+                        ProgressbarUpdateSize.Value =i.PercentSize;
                         BytesDial.SetPercentage(i.PercentSize);
-                        textblockProgressUpdateSize.Text =$"{i.PercentSize}%";
-                        progressbarUpdateNumber.Value = i.PercentNumber;
-                        textblockProgressUpdateNumber.Text = $"{i.PercentNumber}%";
-                        DisplayStatistics(i.Results);
+                        TextBlockProgressUpdateSize.Text =$"{i.PercentSize}%";
+                        ProgressbarUpdateNumber.Value = i.PercentNumber;
+                        TextBlockProgressUpdateNumber.Text = $"{i.PercentNumber}%";
+                        if (i.Results is not null)
+                        {
+                            DisplayStatistics(i.Results);    
+                        }
                         if (_results is {AnyFailures: true}) { SwitchImplementationErrorsDisplay(true); }
                         break;
                     }
@@ -453,8 +465,8 @@ internal partial class RunWindow
 
         private void DisplayMessage(string phase, bool waitingInput)
         {
-            textblockMessage.Foreground = waitingInput ? Brushes.DarkRed : Brushes.ForestGreen;
-            textblockMessage.Text = phase;
+            TextblockMessage.Foreground = waitingInput ? Brushes.DarkRed : Brushes.ForestGreen;
+            TextblockMessage.Text = phase;
         }
 
         private void SetFonts()
@@ -462,14 +474,14 @@ internal partial class RunWindow
             // sets fixed digit width font for numeric displays
             FontFamily fam = new FontFamily("Microsoft Sans Serif");
             double siz = 12;
-            lblSourceFiles.FontFamily = fam;
-            lblSourceFiles.FontSize = siz;
-            lblSourceFolders.FontFamily = fam;
-            lblSourceFolders.FontSize = siz;
-            lblDestinFiles.FontFamily = fam;
-            lblDestinFiles.FontSize = siz;
-            lblDestinFolders.FontFamily = fam;
-            lblDestinFolders.FontSize = siz;
+            LblSourceFiles.FontFamily = fam;
+            LblSourceFiles.FontSize = siz;
+            LblSourceFolders.FontFamily = fam;
+            LblSourceFolders.FontSize = siz;
+            LblDestinFiles.FontFamily = fam;
+            LblDestinFiles.FontSize = siz;
+            LblDestinFolders.FontFamily = fam;
+            LblDestinFolders.FontSize = siz;
 
             FilesToDeleteTBk.FontFamily = fam;
             FilesToDeleteTBk.FontSize = siz;
@@ -511,54 +523,54 @@ internal partial class RunWindow
         {
             SetFonts();
 
-            progressbarSource.Value = 0;
-            textblockProgressSource.Text = string.Empty;
+            ProgressbarSource.Value = 0;
+            TextBlockProgressSource.Text = string.Empty;
 
-            progressbarDestination.Value = 0;
-            textblockProgressDestination.Text = string.Empty;
+            ProgressbarDestination.Value = 0;
+            TextBlockProgressDestination.Text = string.Empty;
 
-            progressbarUpdateSize.Value = 0;
+            ProgressbarUpdateSize.Value = 0;
             BytesDial.SetPercentage(0);
-            textblockProgressUpdateSize.Text = string.Empty;
-            progressbarUpdateNumber.Value = 0;
-            textblockProgressUpdateNumber.Text = string.Empty;
+            TextBlockProgressUpdateSize.Text = string.Empty;
+            ProgressbarUpdateNumber.Value = 0;
+            TextBlockProgressUpdateNumber.Text = string.Empty;
         }
 
         private void PostAnalysisDisplay(ReplicaAnalysis replicaAnalysis)
         {
             _tasks = replicaAnalysis.JobTaskBundle;
 
-            lblSourceFolders.Text = replicaAnalysis.SourceDirectories.ToString("N00", CultureInfo.InvariantCulture);
-            lblSourceFolders.Visibility = Visibility.Visible;
-            lblSourceFoldersL.Visibility = Visibility.Visible;
-            lblSourceFiles.Text = replicaAnalysis.SourceFiles.ToString("N00", CultureInfo.InvariantCulture);
-            lblSourceFiles.Visibility = Visibility.Visible;
-            lblSourceFilesL.Visibility = Visibility.Visible;
+            LblSourceFolders.Text = replicaAnalysis.SourceDirectories.ToString("N00", CultureInfo.InvariantCulture);
+            LblSourceFolders.Visibility = Visibility.Visible;
+            LblSourceFoldersL.Visibility = Visibility.Visible;
+            LblSourceFiles.Text = replicaAnalysis.SourceFiles.ToString("N00", CultureInfo.InvariantCulture);
+            LblSourceFiles.Visibility = Visibility.Visible;
+            LblSourceFilesL.Visibility = Visibility.Visible;
 
-            lblDestinFolders.Text = replicaAnalysis.DestinationDirectories.ToString("N00", CultureInfo.InvariantCulture);
-            lblDestinFolders.Visibility = Visibility.Visible;
-            lblDestinFoldersL.Visibility = Visibility.Visible;
-            lblDestinFiles.Text = replicaAnalysis.DestinationFiles.ToString("N00", CultureInfo.InvariantCulture);
-            lblDestinFiles.Visibility = Visibility.Visible;
-            lblDestinFilesL.Visibility = Visibility.Visible;
+            LblDestinFolders.Text = replicaAnalysis.DestinationDirectories.ToString("N00", CultureInfo.InvariantCulture);
+            LblDestinFolders.Visibility = Visibility.Visible;
+            LblDestinFoldersL.Visibility = Visibility.Visible;
+            LblDestinFiles.Text = replicaAnalysis.DestinationFiles.ToString("N00", CultureInfo.InvariantCulture);
+            LblDestinFiles.Visibility = Visibility.Visible;
+            LblDestinFilesL.Visibility = Visibility.Visible;
 
             long bal = replicaAnalysis.DestinationDirectories - replicaAnalysis.SourceDirectories;
-            lblFolderBalance.Text = bal switch
+            LblFolderBalance.Text = bal switch
             {
                 > 0 => $"{bal:N00} more" 
                 , < 0 => $"{Math.Abs(bal):N00} fewer"
                 , _ => string.Empty
             };
-            lblFolderBalance.Visibility = Visibility.Visible;
+            LblFolderBalance.Visibility = Visibility.Visible;
 
             bal = replicaAnalysis.DestinationFiles - replicaAnalysis.SourceFiles;
-            lblFileBalance.Text = bal switch
+            LblFileBalance.Text = bal switch
             {
                 > 0 => $"{bal:N00} more" 
                 , < 0 => $"{Math.Abs(bal):N00} fewer"
                 , _ => string.Empty
             };
-            lblFileBalance.Visibility = Visibility.Visible;
+            LblFileBalance.Visibility = Visibility.Visible;
 
             FilesToAddTBk.Text = replicaAnalysis.JobTaskBundle.TaskCount("FA").ToString(CultureInfo.InvariantCulture);
             DirectoriesToAddTBk.Text = replicaAnalysis.JobTaskBundle.TaskCount("DA").ToString(CultureInfo.InvariantCulture);
@@ -587,35 +599,35 @@ internal partial class RunWindow
                 if (replicaAnalysis.JobTaskBundle.PathAndFilenameLengthsOk())
                 {
                     DisplayMessage("Ready to update", waitingInput: true);
-                    buttonUpdate.IsEnabled = true;
-                    buttonUpdate.Visibility = Visibility.Visible;
-                    buttonDetail.Tag = replicaAnalysis.JobTaskBundle;
-                    buttonDetail.Visibility = Visibility.Visible;
+                    ButtonUpdate.IsEnabled = true;
+                    ButtonUpdate.Visibility = Visibility.Visible;
+                    ButtonDetail.Tag = replicaAnalysis.JobTaskBundle;
+                    ButtonDetail.Visibility = Visibility.Visible;
                     if (_runOn)
                     {
                         LaunchUpdate();
                     }
                     else
                     {
-                        buttonClose.Content = "Cancel";
-                        buttonClose.Visibility = Visibility.Visible;
+                        ButtonClose.Content = "Cancel";
+                        ButtonClose.Visibility = Visibility.Visible;
                     }
                 }
                 else
                 {
                     DisplayMessage("Filename or path lengths exceeded", waitingInput: true);
                     Fulfilled = false;
-                    buttonDetail.Visibility = Visibility.Visible;
-                    buttonClose.Content = "Close";
-                    buttonClose.Visibility = Visibility.Visible;
+                    ButtonDetail.Visibility = Visibility.Visible;
+                    ButtonClose.Content = "Close";
+                    ButtonClose.Visibility = Visibility.Visible;
                 }
             }
             else
             {
                 DisplayMessage("Nothing to do!", waitingInput: true);
                 Fulfilled = true;
-                buttonClose.Content = "Close";
-                buttonClose.Visibility = Visibility.Visible;
+                ButtonClose.Content = "Close";
+                ButtonClose.Visibility = Visibility.Visible;
             }
         }
 
@@ -648,7 +660,7 @@ internal partial class RunWindow
 
         private void PostUpdateDisplay(UpdaterResults results)
         {
-            buttonCancelUpdate.Visibility = Visibility.Collapsed;
+            ButtonCancelUpdate.Visibility = Visibility.Collapsed;
 
             DisplayStatistics(results);
 
@@ -677,14 +689,14 @@ internal partial class RunWindow
                 freeDiffReport = Kernel.SizeReport(freeDifference) + " more free space";
             }
 
-            lblDestinationAfterScope.Text = $"{Kernel.SizeReport(tot)} total {Kernel.SizeReport(fre)} free ({percentFree}% free) {freeDiffReport}";
-            prgDestinationAfter.Value = 100 - percentFree;
-            stackpanelafter.Visibility = Visibility.Visible;
+            LblDestinationAfterScope.Text = $"{Kernel.SizeReport(tot)} total {Kernel.SizeReport(fre)} free ({percentFree}% free) {freeDiffReport}";
+            PrgDestinationAfter.Value = 100 - percentFree;
+            Stackpanelafter.Visibility = Visibility.Visible;
 
-            buttonDetail.Visibility = Visibility.Visible;
-            buttonClose.Content = "Finish";
-            buttonClose.Visibility = Visibility.Visible;
-            buttonClose.Focus();
+            ButtonDetail.Visibility = Visibility.Visible;
+            ButtonClose.Content = "Finish";
+            ButtonClose.Visibility = Visibility.Visible;
+            ButtonClose.Focus();
             Cursor = Cursors.Arrow;
 
             if (results.AnyFailures)
@@ -708,7 +720,7 @@ internal partial class RunWindow
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             _cts?.Cancel();
-            buttonCancelUpdate.IsEnabled = false;
+            ButtonCancelUpdate.IsEnabled = false;
             DisplayMessage("Cancel requested...", waitingInput: false);
         }
 
@@ -739,11 +751,11 @@ internal partial class RunWindow
             BytesToDoTBk.Visibility = vis;
             BytesDoneTBk.Visibility = vis;
 
-            lblActionFD.Visibility = vis;
-            lblActionDD.Visibility = vis;
-            lblActionDA.Visibility = vis;
-            lblActionFA.Visibility = vis;
-            lblActionFU.Visibility = vis;
+            LblActionFd.Visibility = vis;
+            LblActionDd.Visibility = vis;
+            LblActionDa.Visibility = vis;
+            LblActionFa.Visibility = vis;
+            LblActionFu.Visibility = vis;
 
             FilesToDeleteTBk.Visibility = vis;
             FilesDeletedTBk.Visibility = vis;

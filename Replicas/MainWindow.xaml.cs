@@ -451,6 +451,9 @@ namespace Replicas
 
         private void Runner()
         {
+            if (Kernel.Instance.CurrentTask is null){return;}
+            if (!Kernel.Instance.JobProfiles.Jobs.ContainsKey(Kernel.Instance.CurrentTask)){return;}
+            
             Tache one = Kernel.Instance.JobProfiles.Jobs[Kernel.Instance.CurrentTask];
             if (one.Dangerous)
             {
@@ -464,7 +467,7 @@ namespace Replicas
             }
 
             _tmrUpdate.IsEnabled = false;
-            RunWindow w = new RunWindow() {Owner = this};
+            RunWindow w = new RunWindow(one) {Owner = this};
             Hide();
             w.ShowDialog();
             Show();
