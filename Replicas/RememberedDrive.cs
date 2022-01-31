@@ -28,9 +28,14 @@ internal class RememberedDrive : IComparable<RememberedDrive>
             LastConnected = long.Parse(part[4], CultureInfo.InvariantCulture);
         }
     }
-    int IComparable<RememberedDrive>.CompareTo(RememberedDrive other)
+    int IComparable<RememberedDrive>.CompareTo(RememberedDrive? other)
     {
-        return string.Compare(MyDescription, other.MyDescription, StringComparison.OrdinalIgnoreCase);
+        if (other is { })
+        {
+            return string.Compare(MyDescription, other.MyDescription, StringComparison.OrdinalIgnoreCase);    
+        }
+
+        return 0;
     }
 
 }

@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:uc="clr-namespace:Replicas"
         mc:Ignorable="d"
         Title="Replicate" WindowStyle="None" AllowsTransparency="True" Background="Transparent" Height="600" Width="1100" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing" ContentRendered="Window_ContentRendered" SizeToContent="Height"
         x:ClassModifier="internal">
@@ -60,6 +61,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
+                
                 <Grid Background="LightYellow">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100"/>
@@ -74,12 +76,13 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <TextBlock x:Name="lblHeadingSource" Style="{StaticResource styHeading}"><Run Text="SOURCE"/></TextBlock>
-                    <TextBlock x:Name="lblDriveS" Style="{StaticResource styValue}" Grid.Column="1" ><Run Text="[drive]"/></TextBlock>
-                    <TextBlock x:Name="lblPathS" Style="{StaticResource styValue}" Grid.Row="1" Grid.ColumnSpan="2"><Run Text="[path]"/></TextBlock>
-                    <TextBlock x:Name="lblSourceFoldersL" Style="{StaticResource styCaption}" Grid.Column="3" VerticalAlignment="Center" ><Run Text="directories"/></TextBlock>
-                    <TextBlock x:Name="lblSourceFilesL" Style="{StaticResource styCaption}" Grid.Column="5" VerticalAlignment="Center" ><Run Text="files"/></TextBlock>
-                    <TextBlock x:Name="lblSourceFolders" Style="{StaticResource styValue}" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"><Run Text="0"/></TextBlock>
-                    <TextBlock x:Name="lblSourceFiles" Style="{StaticResource styValue}" Grid.Column="4" HorizontalAlignment="Right" VerticalAlignment="Center"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="lblDriveS" Style="{StaticResource styValue}" Grid.Row="0" Grid.Column="1" ><Run Text="[drive]"/></TextBlock>
+                    <TextBlock x:Name="lblPathS" Style="{StaticResource styValue}" Grid.Row="1" Grid.ColumnSpan="2"
+                               Grid.Column="0"><Run Text="[path]"/></TextBlock>
+                    <TextBlock x:Name="lblSourceFoldersL" Style="{StaticResource styCaption}" Grid.Row="0" Grid.Column="3" VerticalAlignment="Center" ><Run Text="directories"/></TextBlock>
+                    <TextBlock x:Name="lblSourceFilesL" Style="{StaticResource styCaption}" Grid.Row="0" Grid.Column="5" VerticalAlignment="Center" ><Run Text="files"/></TextBlock>
+                    <TextBlock x:Name="lblSourceFolders" Style="{StaticResource styValue}" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="lblSourceFiles" Style="{StaticResource styValue}" Grid.Row="0" Grid.Column="4" HorizontalAlignment="Right" VerticalAlignment="Center"><Run Text="0"/></TextBlock>
                 </Grid>
                 <Grid Grid.Row="1" Background="LightYellow">
                     <Grid.ColumnDefinitions>
@@ -206,7 +209,9 @@
                     <TextBlock x:Name="FileBytesToAddTBk" Style="{StaticResource styNumeric}" Grid.Column="8" Grid.Row="5"><Run Text="0"/></TextBlock>
                     <TextBlock x:Name="FileBytesAddedTBk" Style="{StaticResource styNumeric}" Grid.Column="9" Grid.Row="5"><Run Text="0"/></TextBlock>
                 </Grid>
-                <DockPanel Grid.Row="5" LastChildFill="False">
+                <DockPanel Grid.Row="5" LastChildFill="False" Height="48">
+                    <uc:ProgressDial x:Name="BytesDial" VerticalAlignment="Center"></uc:ProgressDial>
+                    <TextBlock Style="{StaticResource styCaption}" VerticalAlignment="Center" Margin="28 0 0 0"><Run Text="bytes"/></TextBlock>
                     <Button x:Name="buttonClose" Style="{StaticResource styleButtonBold}" Margin="2 6 6 16" VerticalAlignment="Center" Width="128" DockPanel.Dock="Right" Click="CloseButton_Click" Content="Close"/>
                     <Button x:Name="buttonDetail" Style="{StaticResource styleButtonNorm}" Margin="2 6 6 16" VerticalAlignment="Center" Width="128" DockPanel.Dock="Right" Click="LogButton_Click" Content="Detail of actions"/>
                     <Button x:Name="buttonUpdate" Style="{StaticResource styleButtonBold}" Margin="2 6 6 16" VerticalAlignment="Center" Width="128" DockPanel.Dock="Right" Click="UpdateButton_Click" Content="Perform update"/>

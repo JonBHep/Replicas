@@ -34,10 +34,14 @@ internal class ReplicaAction : IComparable<ReplicaAction>
             return System.IO.Path.GetDirectoryName(DestinationPath);
         }
     }
-    public int CompareTo(ReplicaAction obj)
+    public int CompareTo(ReplicaAction? obj)
     {
-        ReplicaAction other = obj as ReplicaAction;
-        return string.Compare(DestinationPath, other.DestinationPath, StringComparison.OrdinalIgnoreCase);
+        if (obj is { })
+        {
+            return string.Compare(DestinationPath, obj.DestinationPath, StringComparison.OrdinalIgnoreCase);    
+        }
+
+        return 0;
     }
     public string SourcePath(string destinationStem, string sourceStem)
     {
