@@ -31,7 +31,8 @@ internal class ReplicaAction : IComparable<ReplicaAction>
     {
         get
         {
-            return System.IO.Path.GetDirectoryName(DestinationPath);
+            string? d = System.IO.Path.GetDirectoryName(DestinationPath);
+            return d ?? string.Empty;
         }
     }
     public int CompareTo(ReplicaAction? obj)

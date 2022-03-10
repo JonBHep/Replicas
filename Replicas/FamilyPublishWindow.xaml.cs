@@ -5,7 +5,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -17,15 +16,15 @@ internal partial class FamilyPublishWindow
         private string? _sourceFolder;
         private string? _targetFolder;
         private long _expectedCount;
-        UpdaterResults? _results;
+        private UpdaterResults _results;
         private string? _sourceFolderMat;
         private string? _targetFolderMat;
         private long _expectedCountMat;
         private string? _sourceFolderPat;
         private string? _targetFolderPat;
         private long _expectedCountPat;
-        private Progress<ProgressInfo>? _progressChaser;
-        private CancellationTokenSource? _cts;
+        private readonly Progress<ProgressInfo> _progressChaser;
+        private readonly CancellationTokenSource _cts;
         private ReplicaJobTasks? _tasks;
         private int _lastUpdateProgressReport;
         private bool _runOn; // whether to run straight on from analysis to perform the update
@@ -34,6 +33,9 @@ internal partial class FamilyPublishWindow
         {
             InitializeComponent();
             _paternity = pat;
+            _results = new UpdaterResults();
+            _progressChaser = new Progress<ProgressInfo>(DisplayProgress);
+            _cts = new CancellationTokenSource();
         }
 
         private static string SettingsFile
@@ -50,17 +52,22 @@ internal partial class FamilyPublishWindow
             string path = SettingsFile;
             if (File.Exists(path))
             {
-                using (StreamReader sr = new StreamReader(path))
+                using StreamReader sr = new StreamReader(path);
+                _sourceFolderMat = sr.ReadLine();
+                _targetFolderMat = sr.ReadLine();
+                string? l = sr.ReadLine();
+                if (l is not null)
                 {
-                    _sourceFolderMat = sr.ReadLine();
-                    _targetFolderMat = sr.ReadLine();
-                    string l = sr.ReadLine();
-                    _expectedCountMat = long.Parse(l, CultureInfo.InvariantCulture);
-                    _sourceFolderPat = sr.ReadLine();
-                    _targetFolderPat = sr.ReadLine();
-                    l = sr.ReadLine();
-                    _expectedCountPat = long.Parse(l, CultureInfo.InvariantCulture);
+                    _expectedCountMat = long.Parse(l, CultureInfo.InvariantCulture);    
                 }
+                _sourceFolderPat = sr.ReadLine();
+                _targetFolderPat = sr.ReadLine();
+                l = sr.ReadLine();
+                if (l is not null)
+                {
+                    _expectedCountPat = long.Parse(l, CultureInfo.InvariantCulture);    
+                }
+                
                 if (_paternity)
                 {
                     _sourceFolder = _sourceFolderPat;
@@ -95,22 +102,20 @@ internal partial class FamilyPublishWindow
             string path = SettingsFile;
             Jbh.AppManager.CreateBackupDataFile(path);
             Jbh.AppManager.PurgeOldBackups("jbh", 5, 5);
-            using (StreamWriter sw = new StreamWriter(path))
-            {
-                sw.WriteLine(_sourceFolderMat);
-                sw.WriteLine(_targetFolderMat);
-                sw.WriteLine(_expectedCountMat.ToString(CultureInfo.InvariantCulture));
-                sw.WriteLine(_sourceFolderPat);
-                sw.WriteLine(_targetFolderPat);
-                sw.WriteLine(_expectedCountPat.ToString( CultureInfo.InvariantCulture));
-            }
+            using StreamWriter sw = new StreamWriter(path);
+            sw.WriteLine(_sourceFolderMat);
+            sw.WriteLine(_targetFolderMat);
+            sw.WriteLine(_expectedCountMat.ToString(CultureInfo.InvariantCulture));
+            sw.WriteLine(_sourceFolderPat);
+            sw.WriteLine(_targetFolderPat);
+            sw.WriteLine(_expectedCountPat.ToString( CultureInfo.InvariantCulture));
         }
 
         private void SelectSourceButton_Click(object sender, RoutedEventArgs e)
         {
             FolderBrowser browser = new FolderBrowser() { Owner = this };
-            bool? Q = browser.ShowDialog();
-            if (Q.HasValue && Q.Value)
+            bool? q = browser.ShowDialog();
+            if (q.HasValue && q.Value)
             {
                 _sourceFolder = browser.SelectedDirectory;
                 SourceTextBlock.Text = _sourceFolder;
@@ -120,8 +125,8 @@ internal partial class FamilyPublishWindow
         private void SelectTargetButton_Click(object sender, RoutedEventArgs e)
         {
             FolderBrowser browser = new FolderBrowser() { Owner = this };
-            bool? Q = browser.ShowDialog();
-            if (Q.HasValue && Q.Value)
+            bool? q = browser.ShowDialog();
+            if (q.HasValue && q.Value)
             {
                 _targetFolder = browser.SelectedDirectory;
                 TargetTextBlock.Text = _targetFolder;
@@ -143,7 +148,7 @@ internal partial class FamilyPublishWindow
 
             SwitchImplementationDisplay(false);
             SwitchImplementationErrorsDisplay(false);
-            _progressChaser = new Progress<ProgressInfo>(info => { DisplayProgress(info); });
+            
 
         }
 
@@ -168,23 +173,23 @@ internal partial class FamilyPublishWindow
             SaveSettings();
         }
 
-        private void ImplementUpdate(string SourceRootDir, string DestinationRootDir, ReplicaJobTasks jobs, IProgress<ProgressInfo> prog, CancellationToken cancellationToken)
+        private void ImplementUpdate(string sourceRootDir, string destinationRootDir, ReplicaJobTasks jobs, IProgress<ProgressInfo> prog, CancellationToken cancellationToken)
         {
             _results = new UpdaterResults();
-            string destinationRoot = DestinationRootDir;
-            string sourceRoot = SourceRootDir;
+            string destinationRoot = destinationRootDir;
+            string sourceRoot = sourceRootDir;
             long progressTarget = jobs.TotalBulk();
             long progressCounter = 0;
 
-            List<ReplicaAction> actionlistFD = jobs.TaskList("FD");
-            List<ReplicaAction> actionlistDD = jobs.TaskList("DD");
-            List<ReplicaAction> actionlistDA = jobs.TaskList("DA");
-            List<ReplicaAction> actionlistFU = jobs.TaskList("FU");
-            List<ReplicaAction> actionlistFA = jobs.TaskList("FA");
+            List<ReplicaAction> actionListFd = jobs.TaskList("FD");
+            List<ReplicaAction> actionListDd = jobs.TaskList("DD");
+            List<ReplicaAction> actionListDa = jobs.TaskList("DA");
+            List<ReplicaAction> actionListFu = jobs.TaskList("FU");
+            List<ReplicaAction> actionListFa = jobs.TaskList("FA");
 
-            if (actionlistFD.Count > 0)
+            if (actionListFd.Count > 0)
             {
-                foreach (ReplicaAction act in actionlistFD)
+                foreach (ReplicaAction act in actionListFd)
                 {
                     progressCounter += act.Bulk;
                     // Remove any attributes from the destination file
@@ -214,9 +219,9 @@ internal partial class FamilyPublishWindow
                 if (cancellationToken.IsCancellationRequested) { goto finishing; }
             }
 
-            if (actionlistDD.Count > 0)
+            if (actionListDd.Count > 0)
             {
-                foreach (ReplicaAction act in actionlistDD)
+                foreach (ReplicaAction act in actionListDd)
                 {
                     progressCounter += act.Bulk;
                     string faute = Kernel.AttemptToDeleteDirectory(act.DestinationPath);
@@ -235,9 +240,9 @@ internal partial class FamilyPublishWindow
                 if (cancellationToken.IsCancellationRequested) { goto finishing; }
             }
 
-            if (actionlistDA.Count > 0)
+            if (actionListDa.Count > 0)
             {
-                foreach (ReplicaAction act in actionlistDA)
+                foreach (ReplicaAction act in actionListDa)
                 {
                     progressCounter += act.Bulk;
                     string faute = Kernel.AttemptToAddDirectory(act.DestinationPath);
@@ -256,9 +261,9 @@ internal partial class FamilyPublishWindow
                 if (cancellationToken.IsCancellationRequested) { goto finishing; }
             }
 
-            if (actionlistFU.Count > 0)
+            if (actionListFu.Count > 0)
             {
-                foreach (ReplicaAction act in actionlistFU)
+                foreach (ReplicaAction act in actionListFu)
                 {
                     progressCounter += act.Bulk;
                     
@@ -298,9 +303,9 @@ internal partial class FamilyPublishWindow
                 if (cancellationToken.IsCancellationRequested) { goto finishing; }
             }
 
-            if (actionlistFA.Count > 0)
+            if (actionListFa.Count > 0)
             {
-                foreach (ReplicaAction act in actionlistFA)
+                foreach (ReplicaAction act in actionListFa)
                 {
                     progressCounter += act.Bulk;
 
@@ -358,7 +363,7 @@ internal partial class FamilyPublishWindow
                     if (cancellationToken.IsCancellationRequested) { break; }
                 }
             }
-        finishing:
+            finishing:
             // send a final progress report to ensure that the final display is up-to-date
             SendUpdateProgressReport(progressCounter, progressTarget, _results, prog);
             if (cancellationToken.IsCancellationRequested) { _results.WasCancelled = true; }
@@ -380,12 +385,14 @@ internal partial class FamilyPublishWindow
 
             // NB This implementation polls CancellationToken.IsCancellationRequested (bool) rather than throwing an error
             // Compare the example in FamilyTree - detectIntramarriages which uses the error method (which Cleary favours)
-            _cts = new CancellationTokenSource();
+            
             CancellationToken token = _cts.Token;
-            await Task.Run(() => ImplementUpdate(_sourceFolder, _targetFolder, _tasks, _progressChaser, token)).ConfigureAwait(true);
-            Kernel.SoundSignal(600, 500);
-            PostUpdateDisplay(_results);
-
+            if ((_sourceFolder is not null) && (_targetFolder is not null) && (_tasks is not null))
+            {
+                await Task.Run(() => ImplementUpdate(_sourceFolder, _targetFolder, _tasks, _progressChaser, token)).ConfigureAwait(true);
+                Kernel.SoundSignal(600, 500);
+                PostUpdateDisplay(_results);    
+            }
         }
 
         private async void Analyse_Click(object sender, RoutedEventArgs e)
@@ -397,38 +404,39 @@ internal partial class FamilyPublishWindow
                 MessageBox.Show("Either the source or target directory does not exist", "Reselect paths", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
-            Button source = sender as Button;
             ButtonAnalyse.Visibility = Visibility.Collapsed;
             ButtonAnalysePlus.Visibility = Visibility.Collapsed;
-            if (source == ButtonAnalyse) { _runOn = false; } else { _runOn = true; }
+            _runOn = !Equals(sender, ButtonAnalyse);
 
             Cursor = Cursors.Wait;
             ButtonClose.Visibility = Visibility.Collapsed;
             DisplayMessage("Analysing", waitingInput: false);
 
-            FamilyAnalysis _analysis = new FamilyAnalysis(sourceRootDir: _sourceFolder, destinationRootDir: _targetFolder, expectedItemCount: _expectedCount, _progressChaser);
+            FamilyAnalysis analysis = new FamilyAnalysis(sourceRootDir: _sourceFolder, destinationRootDir: _targetFolder, expectedItemCount: _expectedCount, _progressChaser);
 
-            await Task.Run(() => _analysis.PerformAnalysis()).ConfigureAwait(true);
+            await Task.Run(() => analysis.PerformAnalysis()).ConfigureAwait(true);
 
-            if (_paternity) { _expectedCountPat = _analysis.ExpectedItemCount; } else { _expectedCountMat = _analysis.ExpectedItemCount; }
+            if (_paternity) { _expectedCountPat = analysis.ExpectedItemCount; } else { _expectedCountMat = analysis.ExpectedItemCount; }
 
-            PostAnalysisDisplay(_analysis);
+            PostAnalysisDisplay(analysis);
             Kernel.SoundSignal(300, 500);
         }
 
         private void LogButton_Click(object sender, RoutedEventArgs e)
         {
-            string root = _targetFolder;
-            ActionDetailsWindow w = new ActionDetailsWindow(_tasks, root.Length)
+            if ((_tasks is not null)&& (_targetFolder is not null))
             {
-                Owner = this
-            };
-            w.ShowDialog();
+                ActionDetailsWindow w = new ActionDetailsWindow(_tasks, _targetFolder.Length)
+                {
+                    Owner = this
+                };
+                w.ShowDialog();    
+            }
         }
 
         private void DisplayMessage(string phase, bool waitingInput)
         {
-            if (waitingInput) { TextBlockMessage.Foreground = Brushes.DarkRed; } else { TextBlockMessage.Foreground = Brushes.ForestGreen; }
+            TextBlockMessage.Foreground = waitingInput ? Brushes.DarkRed : Brushes.ForestGreen;
             TextBlockMessage.Text = phase;
         }
 
@@ -494,40 +502,40 @@ internal partial class FamilyPublishWindow
            
         }
 
-        private void PostAnalysisDisplay(FamilyAnalysis _anal)
+        private void PostAnalysisDisplay(FamilyAnalysis anal)
         {
-            _tasks = _anal.JobTaskBundle;
+            _tasks = anal.JobTaskBundle;
 
-            FilesToAddTBk.Text = _anal.JobTaskBundle.TaskCount("FA").ToString(CultureInfo.InvariantCulture);
-            DirectoriesToAddTBk.Text = _anal.JobTaskBundle.TaskCount("DA").ToString(CultureInfo.InvariantCulture);
-            FilesToDeleteTBk.Text = _anal.JobTaskBundle.TaskCount("FD").ToString(CultureInfo.InvariantCulture);
-            DirectoriesToDeleteTBk.Text = _anal.JobTaskBundle.TaskCount("DD").ToString(CultureInfo.InvariantCulture);
-            FilesToUpdateTBk.Text = _anal.JobTaskBundle.TaskCount("FU").ToString(CultureInfo.InvariantCulture);
+            FilesToAddTBk.Text = anal.JobTaskBundle.TaskCount("FA").ToString(CultureInfo.InvariantCulture);
+            DirectoriesToAddTBk.Text = anal.JobTaskBundle.TaskCount("DA").ToString(CultureInfo.InvariantCulture);
+            FilesToDeleteTBk.Text = anal.JobTaskBundle.TaskCount("FD").ToString(CultureInfo.InvariantCulture);
+            DirectoriesToDeleteTBk.Text = anal.JobTaskBundle.TaskCount("DD").ToString(CultureInfo.InvariantCulture);
+            FilesToUpdateTBk.Text = anal.JobTaskBundle.TaskCount("FU").ToString(CultureInfo.InvariantCulture);
 
             SwitchImplementationDisplay(true);
 
             Cursor = Cursors.Arrow;
 
             string f = "Some source files are older than the corresponding destination files.\nThis may mean that the destination directory has been updated more recently than the source directory.\nIt could also result from files being renamed.\nAll files of different date or size will be overwritten by source files.\nDo not update unless confident that you want to replace newer files with older.";
-            if (_anal.OlderSourceWarnings.Count > 0)
+            if (anal.OlderSourceWarnings.Count > 0)
             {
                 WarningsWindow ww = new WarningsWindow();
                 ww.SetCaption("Source older than destination");
                 ww.SetComment(f);
                 ww.LstExamples.Items.Clear();
-                foreach (string g in _anal.OlderSourceWarnings) { ww.LstExamples.Items.Add(g); }
+                foreach (string g in anal.OlderSourceWarnings) { ww.LstExamples.Items.Add(g); }
                 ww.ShowDialog();
                 _runOn = false; // don't automatically run the update if queries have been raised
             }
 
-            if (_anal.JobTaskBundle.GrandTotal > 0)
+            if (anal.JobTaskBundle.GrandTotal > 0)
             {
-                if (_anal.JobTaskBundle.PathAndFilenameLengthsOk())
+                if (anal.JobTaskBundle.PathAndFilenameLengthsOk())
                 {
                     DisplayMessage("Ready to update", waitingInput: true);
                     ButtonUpdate.IsEnabled = true;
                     ButtonUpdate.Visibility = Visibility.Visible;
-                    ButtonDetail.Tag = _anal.JobTaskBundle;
+                    ButtonDetail.Tag = anal.JobTaskBundle;
                     ButtonDetail.Visibility = Visibility.Visible;
                     if (_runOn)
                     {
@@ -579,14 +587,7 @@ internal partial class FamilyPublishWindow
 
             DisplayStatistics(results);
 
-            if (results.WasCancelled)
-            {
-                DisplayMessage("Update cancelled", waitingInput: true);
-            }
-            else
-            {
-                DisplayMessage("Finished", waitingInput: true);
-            }
+            DisplayMessage(results.WasCancelled ? "Update cancelled" : "Finished", waitingInput: true);
 
             ButtonDetail.Visibility = Visibility.Visible;
             ButtonClose.Content = "Finish";
@@ -599,12 +600,17 @@ internal partial class FamilyPublishWindow
                 SwitchImplementationErrorsDisplay(true);
                 if (MessageBox.Show("There were errors - do you want to view the action details?", "Replicate", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    string root = _targetFolder;
-                    ActionDetailsWindow w = new ActionDetailsWindow(_tasks, root.Length)
+                    if (_targetFolder is not null)
                     {
-                        Owner = this
-                    };
-                    w.ShowDialog();
+                        if (_tasks is not null)
+                        {
+                            ActionDetailsWindow w = new ActionDetailsWindow(_tasks, _targetFolder.Length)
+                            {
+                                Owner = this
+                            };
+                            w.ShowDialog();
+                        }
+                    }
                 }
             }
         }
@@ -658,20 +664,20 @@ internal partial class FamilyPublishWindow
 
         private void SendUpdateProgressReport(long progressValue, long progressTarget, UpdaterResults report, IProgress<ProgressInfo> prog)
         {
-            int ProgressReport = Convert.ToInt32(((double)progressValue / progressTarget) * 100);
-            if (ProgressReport > 100) { ProgressReport = 100; } // don't exceed 100%
-            if (ProgressReport != _lastUpdateProgressReport)
+            int progressReport = Convert.ToInt32(((double)progressValue / progressTarget) * 100);
+            if (progressReport > 100) { progressReport = 100; } // don't exceed 100%
+            if (progressReport != _lastUpdateProgressReport)
             {
-                ProgressInfo info = new ProgressInfo(0, ProgressReport, 'U', report);
+                ProgressInfo info = new ProgressInfo(0, progressReport, 'U', report);
                 prog.Report(info);
-                _lastUpdateProgressReport = ProgressReport;
+                _lastUpdateProgressReport = progressReport;
             }
         }
         
         void DisplayProgress(ProgressInfo i)
         {
-            char Q = i.Phase;
-            switch (Q)
+            char q = i.Phase;
+            switch (q)
             {
                 case 'S':
                     {
@@ -689,7 +695,10 @@ internal partial class FamilyPublishWindow
                     {
                         ProgressbarUpdate.Value = i.PercentNumber;
                         TextBlockProgressUpdate.Text = $"{i.PercentNumber}%";
-                        DisplayStatistics(i.Results);
+                        if (i.Results is not null)
+                        {
+                            DisplayStatistics(i.Results);    
+                        }
                         break;
                     }
             }

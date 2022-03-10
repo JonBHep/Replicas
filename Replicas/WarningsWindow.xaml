@@ -4,14 +4,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         mc:Ignorable="d"
-        Title="Warnings" Height="300" Width="300" Background="Ivory" Topmost="True" WindowStartupLocation="CenterScreen"
+        Title="Warnings" Height="500" Width="800" Background="Ivory" Topmost="True" WindowStartupLocation="CenterScreen"
         x:ClassModifier="internal">
-    <Grid d:IsLocked="True">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <TextBlock x:Name="LblMessage" Margin="6" TextWrapping="Wrap" Background="Linen" d:IsLocked="True"><Run Text="Message..."/></TextBlock>
-        <ListBox x:Name="LstExamples" Grid.Row="1" Margin="6" d:IsLocked="True"/>
+        <TextBlock x:Name="LblMessage" Margin="6" TextWrapping="Wrap" Background="Linen" ><Run Text="Message..."/></TextBlock>
+        <ListBox x:Name="LstExamples" Grid.Row="1" Margin="6"/>
     </Grid>
 </Window>

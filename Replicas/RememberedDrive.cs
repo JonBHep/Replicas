@@ -5,8 +5,8 @@ namespace Replicas;
 
 internal class RememberedDrive : IComparable<RememberedDrive>
 {
-    internal string VolumeLabel { get; set; }
-    internal string MyDescription { get; set; }
+    internal string VolumeLabel { get; set; } = string.Empty;
+    internal string MyDescription { get; set; } = string.Empty;
     internal long Capacity { get; set; }
     internal int PercentUsed { get; set; }
     internal long LastConnected { get; set; }

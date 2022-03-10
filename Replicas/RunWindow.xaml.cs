@@ -435,7 +435,7 @@ internal partial class RunWindow
                     }
                 case 'U':
                     {
-                        ProgressbarUpdateSize.Value =i.PercentSize;
+                        // ProgressbarUpdateSize.Value =i.PercentSize;
                         BytesDial.SetPercentage(i.PercentSize);
                         TextBlockProgressUpdateSize.Text =$"{i.PercentSize}%";
                         ProgressbarUpdateNumber.Value = i.PercentNumber;
@@ -529,7 +529,7 @@ internal partial class RunWindow
             ProgressbarDestination.Value = 0;
             TextBlockProgressDestination.Text = string.Empty;
 
-            ProgressbarUpdateSize.Value = 0;
+            // ProgressbarUpdateSize.Value = 0;
             BytesDial.SetPercentage(0);
             TextBlockProgressUpdateSize.Text = string.Empty;
             ProgressbarUpdateNumber.Value = 0;

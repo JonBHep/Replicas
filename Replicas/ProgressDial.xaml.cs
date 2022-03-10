@@ -10,7 +10,7 @@ public partial class ProgressDial
     public ProgressDial()
         {
             InitializeComponent();
-            _polyDialFace.Fill = Brushes.Cornsilk;
+            _polyDialFace.Fill = Brushes.Ivory;
             DrawPolygon();
             _polyProgress.Stroke = Brushes.Tan;
             _polyProgress.StrokeThickness = 0.5;

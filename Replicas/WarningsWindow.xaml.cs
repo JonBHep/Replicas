@@ -15,9 +15,5 @@ internal partial class WarningsWindow
     {
         LblMessage.Text = txt;
     }
-
-    public void AddToList(string txt)
-    {
-        LstExamples.Items.Add(txt);
-    }
+    
 }

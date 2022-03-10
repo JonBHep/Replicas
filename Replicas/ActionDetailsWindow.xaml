@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         Title="Action details" Height="300" Width="600" WindowState="Maximized" x:ClassModifier="internal">
     <Window.Resources>
-        <DataTemplate x:Key="templateError" >
+        <DataTemplate x:Key="TemplateError" >
             <TextBlock Foreground="Red" FontWeight="DemiBold" Text="{Binding ErrorText}"/>
         </DataTemplate>
         <Style TargetType="GridViewColumnHeader">
@@ -19,15 +19,15 @@
             <RowDefinition Height="36"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <ComboBox x:Name="cboPreviewCategory" Width="200" Margin="8,2,8,2" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="CboPreviewCategory_SelectionChanged" IsReadOnly="True"/>
-        <Button x:Name="buttonClose" Style="{StaticResource styleButtonNorm}" HorizontalAlignment="Right" Margin="3" Width="80" Click="CloseButton_Click" IsCancel="True" >Close</Button>
-        <ListView x:Name="lvwPreview" Grid.Row="1" FontFamily="Verdana">
+        <ComboBox x:Name="CboPreviewCategory" Width="200" Margin="8,2,8,2" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="CboPreviewCategory_SelectionChanged" IsReadOnly="True"/>
+        <Button Grid.Row="0" Style="{StaticResource styleButtonNorm}" HorizontalAlignment="Right" Margin="3" Width="80" Click="CloseButton_Click" IsCancel="True" >Close</Button>
+        <ListView x:Name="LvwPreview" Grid.Row="1" FontFamily="Verdana">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Item" DisplayMemberBinding="{Binding ItemName}"/>
                     <GridViewColumn Header="Path" DisplayMemberBinding="{Binding DestinationFolder}"/>
                     <GridViewColumn Header="Rationale" DisplayMemberBinding="{Binding Rationale}"/>
-                    <GridViewColumn Header="Error report" CellTemplate="{StaticResource templateError}"/>
+                    <GridViewColumn Header="Error report" CellTemplate="{StaticResource TemplateError}"/>
                 </GridView>
             </ListView.View>
         </ListView>
