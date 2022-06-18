@@ -157,6 +157,7 @@
                         <RowDefinition/>
                         <RowDefinition/>
                         <RowDefinition/>
+                        <RowDefinition/>
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="1" Style="{StaticResource StyCaption}">Examine source directories and files</TextBlock>
@@ -213,10 +214,10 @@
                     <TextBlock x:Name="FileAddErrorsTBk" Style="{StaticResource StyNumeric}" Grid.Column="7" Grid.Row="5" Foreground="Red"><Run Text="0"/></TextBlock>
                     <TextBlock x:Name="FileBytesToAddTBk" Style="{StaticResource StyNumeric}" Grid.Column="8" Grid.Row="5"><Run Text="0"/></TextBlock>
                     <TextBlock x:Name="FileBytesAddedTBk" Style="{StaticResource StyNumeric}" Grid.Column="9" Grid.Row="5"><Run Text="0"/></TextBlock>
+                    <TextBlock x:Name="LargeFileTextBlock" Grid.Row="6" Grid.ColumnSpan="10" Grid.Column="0"></TextBlock>
                 </Grid>
+                
                 <DockPanel Grid.Row="5" LastChildFill="False" Height="48">
-                    
-                    <!-- <TextBlock Style="{StaticResource StyCaption}" VerticalAlignment="Center" Margin="28 0 0 0"><Run Text="bytes"/></TextBlock> -->
                     <Button x:Name="ButtonClose" Style="{StaticResource styleButtonBold}" Margin="2 6 6 16" VerticalAlignment="Center" Width="128" DockPanel.Dock="Right" Click="CloseButton_Click" Content="Close"/>
                     <Button x:Name="ButtonDetail" Style="{StaticResource styleButtonNorm}" Margin="2 6 6 16" VerticalAlignment="Center" Width="128" DockPanel.Dock="Right" Click="LogButton_Click" Content="Detail of actions"/>
                     <Button x:Name="ButtonUpdate" Style="{StaticResource styleButtonBold}" Margin="2 6 6 16" VerticalAlignment="Center" Width="128" DockPanel.Dock="Right" Click="UpdateButton_Click" Content="Perform update"/>

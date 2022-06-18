@@ -293,6 +293,11 @@ internal partial class RunWindow
                         File.Copy(act.SourcePath(destinationRoot, sourceRoot), act.DestinationPath, overwrite: true);
                         _results.FileAddSuccess++;
                         _results.FileAddBytes += act.Bulk;
+                        if (act.Bulk > _results.LargeFileSize)
+                        {
+                            _results.LargeFileName = act.ItemName;
+                            _results.LargeFileSize = act.Bulk;
+                        }
                     }
                     catch (UnauthorizedAccessException ex)
                     {
@@ -442,7 +447,7 @@ internal partial class RunWindow
                         TextBlockProgressUpdateNumber.Text = $"{i.PercentNumber}%";
                         if (i.Results is not null)
                         {
-                            DisplayStatistics(i.Results);    
+                            DisplayStatistics(i.Results);
                         }
                         if (_results is {AnyFailures: true}) { SwitchImplementationErrorsDisplay(true); }
                         break;
@@ -633,6 +638,8 @@ internal partial class RunWindow
 
         private void DisplayStatistics(UpdaterResults results)
         {
+            LargeFileTextBlock.Text = results.LargeFileName;
+            
             FilesDeletedTBk.Text = results.FileDelSuccess.ToString(CultureInfo.InvariantCulture);
             int f = results.FileDelFailure;
             FileDeleteErrorsTBk.Text =(f>0) ? f.ToString(CultureInfo.InvariantCulture) : string.Empty;
@@ -663,7 +670,7 @@ internal partial class RunWindow
             ButtonCancelUpdate.Visibility = Visibility.Collapsed;
 
             DisplayStatistics(results);
-
+            LargeFileTextBlock.Text = string.Empty;
             if (results.WasCancelled)
             {
                 DisplayMessage("Update cancelled", waitingInput: true);
@@ -733,6 +740,7 @@ internal partial class RunWindow
 
             if ((ts.TotalSeconds < 1) && (!showRegardless)) { return; } // don't send another PR within 1 second unless it is the final one
             _lastUpdatePrTime = ici;
+            report.LargeFileSize = 0; // reset for next interval
             int progressReportSize = Convert.ToInt32(((double)progressSizeValue / progressSizeTarget) * 100);
             if (progressReportSize > 100) { progressReportSize = 100; } // don't exceed 100%
             int progressReportNumber = Convert.ToInt32(((double)progressNumberValue / progressNumberTarget) * 100);

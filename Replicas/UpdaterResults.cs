@@ -20,19 +20,15 @@ internal class UpdaterResults
     public int FileAddFailure { get; set; }
     public long FileAddBytes { get; set; }
     public long FileAddBytesTarget { get; set; }
-
+    public string LargeFileName { get; set; }
+    public long LargeFileSize { get; set; }
     public bool WasCancelled { get; set; }
 
-    public bool AnyFailures
-    {
-        get
-        {
-            return ((FileDelFailure + DirDelFailure + DirAddFailure + FileAddFailure + FileUpdFailure) > 0);
-        }
-    }
+    public bool AnyFailures => ((FileDelFailure + DirDelFailure + DirAddFailure + FileAddFailure + FileUpdFailure) > 0);
 
     public UpdaterResults()
     {
+        LargeFileName = string.Empty;
         FileDelSuccess = 0;
         FileDelFailure = 0;
         DirDelSuccess = 0;

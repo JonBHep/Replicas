@@ -9,8 +9,8 @@ internal class ProgressInfo
         PercentNumber = pcn;
         Results = rs;
     }
-    public char Phase { get; set; }
-    public int PercentSize { get; set; }
-    public int PercentNumber { get; set; }
-    public UpdaterResults? Results {get; set;}
+    public char Phase { get; }
+    public int PercentSize { get; }
+    public int PercentNumber { get; }
+    public UpdaterResults? Results {get; }
 }
